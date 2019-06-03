@@ -1,7 +1,8 @@
-#ifndef MULTIPLESET_H
+﻿#ifndef MULTIPLESET_H
 #define MULTIPLESET_H
 
 #include <QWidget>
+#include <QMessageBox>
 
 namespace Ui {
 class MultipleSet;
@@ -25,7 +26,11 @@ private slots:
     void slt_clearTextEdit();
 
 private:
+    bool judgeSettingInfo();
+    QString getIpAddr();
+private:
     Ui::MultipleSet *ui;
+
 };
 
 #endif // MULTIPLESET_H

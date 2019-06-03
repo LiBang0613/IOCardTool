@@ -18,6 +18,12 @@ struct DataCardInfo
     QString strIp;            //数采卡的ip地址
 };
 
+struct RunTime
+{
+    bool bJudge;            //开始测试或者停止的标志
+    QString strBeginTime;   //开始测试的时间
+};
+
 
 namespace Ui {
 class DaqSet;
@@ -40,22 +46,27 @@ private slots:
 
     void slt_clearTxetEdit();
 
+    //接收数采卡对象的发送和接收到的数据，显示在文本区域中。
     void slt_recvCardInfo(QString ip,QString before,QString after);
 
+    //接收数采卡对象的发送命令的总次数和失败次数的槽函数
     void slt_receCardTimes(QString Ip,int total,int failed);
 
     void on_rb_Moxa_clicked();
 
     void on_rb_smacq_clicked();
 
-
     void on_comB_cardType_currentIndexChanged(const QString &arg1);
+
+private:
+    bool judgeSettingInfo();
+    QString getIpAddr();
 
 private:
     Ui::DaqSet *ui;
     QTimer m_clearTextTimer;                    //清除文本框信息的定时器，信息很多会导致内存上升。
-    QMap<QString,QString> m_mapCardRunTime;     //记录数采卡开始的时间，用于更新数采卡连接总时间。
-//    QMap<QString,QObject*>m_test;
+    QMap<QString,RunTime> m_mapCardRunTime;     //记录数采卡开始的时间，用于更新数采卡连接总时间。
+//    QMap<QString,IOCard*>m_mapIOCardObject;   //保存数采卡对象，key=ip，
 };
 
 #endif // DAQSET_H

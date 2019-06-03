@@ -118,7 +118,14 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QLineEdit" name="le_ip1"/>
+             <widget class="QLineEdit" name="le_ip1">
+              <property name="maxLength">
+               <number>3</number>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_6">
@@ -131,7 +138,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="le_ip2"/>
+             <widget class="QLineEdit" name="le_ip2">
+              <property name="maxLength">
+               <number>3</number>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_7">
@@ -144,7 +155,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="le_ip3"/>
+             <widget class="QLineEdit" name="le_ip3">
+              <property name="maxLength">
+               <number>3</number>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_8">
@@ -157,7 +172,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="le_ip4"/>
+             <widget class="QLineEdit" name="le_ip4">
+              <property name="maxLength">
+               <number>3</number>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

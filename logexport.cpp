@@ -1,7 +1,7 @@
 ﻿#include "logexport.h"
 #include <QCoreApplication>
 #include <QDebug>
-#include <thread>
+#include <QThread>
 
 LogExport *ManageLog::m_logExport = nullptr;
 QThread *ManageLog::m_exportThread = nullptr;

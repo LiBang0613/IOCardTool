@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete m_tcpSocket;
+//    delete m_tcpSocket;
     delete ui;
 }
 

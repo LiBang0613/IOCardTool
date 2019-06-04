@@ -9,6 +9,10 @@ MultipleSet::MultipleSet(QWidget *parent) :
     ui(new Ui::MultipleSet)
 {
     ui->setupUi(this);
+    ui->le_ip1->setValidator(new QIntValidator(0,255,ui->le_ip1));
+    ui->le_ip2->setValidator(new QIntValidator(0,255,ui->le_ip2));
+    ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
+    ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
 }
 
 MultipleSet::~MultipleSet()
@@ -22,6 +26,32 @@ void MultipleSet::on_pb_saveInfo_clicked()
     {
         return;
     }
+    int row = ui->table_Info->rowCount();
+    ui->table_Info->insertRow(row);
+    int num1211,num1240;
+    switch (ui->comB_deviceType->currentIndex())
+    {
+    case dtDevice1:
+            num1211 = 2;
+            num1240 = 1;
+        break;
+    case dtDevice2:
+            num1211 = 3;
+            num1240 = 0;
+        break;
+    case dtDevice3:
+            num1211 = 0;
+            num1240 = 3;
+        break;
+    case dtDevice4:
+            num1211 = 1;
+            num1240 = 2;
+        break;
+    }
+    ui->table_Info->setItem(row,0,new QTableWidgetItem(ui->comB_deviceType->currentText().trimmed()));
+    ui->table_Info->setItem(row,1,new QTableWidgetItem(getIpAddr()));
+    ui->table_Info->setItem(row,2,new QTableWidgetItem(QString::number(num1211)));
+    ui->table_Info->setItem(row,3,new QTableWidgetItem(QString::number(num1240)));
 }
 
 void MultipleSet::on_pb_start_clicked()

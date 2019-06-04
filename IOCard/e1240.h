@@ -8,11 +8,15 @@ class IOCARDSHARED_EXPORT E1240 : public IOCard
 public:
     E1240();
     ~E1240();
+
 protected:
     bool Query_Read(QByteArray &sendBuf,int &nLen);
-    bool Response_Read(QByteArray recvBuf,int nlen);
+    bool Response_Read(QByteArray recvBuf, int nLen);
 
     void Process();
+
+protected slots:
+    void slt_readyead();
 };
 
 #endif // E1240_H

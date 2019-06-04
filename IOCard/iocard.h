@@ -29,8 +29,8 @@ protected:
 
 protected slots:
     void slt_tcpConnected();
-    void slt_recvSocketState(QAbstractSocket::SocketState);
-    void slt_readyRead();
+    void slt_recvSocketState(QAbstractSocket::SocketState state);
+    virtual void slt_readyRead() = 0;
 
 signals:
     //统计数据信号，发送多少次命令，失败多少次

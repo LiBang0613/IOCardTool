@@ -12,9 +12,15 @@ public:
 protected:
     bool Query_Read(QByteArray& sendBuf, int& nLen);
     bool Response_Read(QByteArray recvBuf,int nLen);
-    bool Query_Write(QByteArray& sendBuf,int& nlen);
+    bool Query_Write(QByteArray& sendBuf, int& nLen);
     bool Response_Write(QByteArray recvBuf, int nLen);
     void Process();
+
+protected slots:
+    void slt_readyRead();
+
+private:
+    bool m_bMarkState;
 };
 
 #endif // E1211_H

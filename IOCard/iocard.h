@@ -4,6 +4,7 @@
 #include "iocard_global.h"
 #include <QObject>
 #include <QTcpSocket>
+#include <QThread>
 
 class IOCARDSHARED_EXPORT IOCard : public QObject
 {
@@ -25,6 +26,11 @@ protected:
     void startThread();
     //停止通讯线程
     void stopThread();
+
+protected slots:
+    void slt_tcpConnected();
+    void slt_recvSocketState(QAbstractSocket::SocketState);
+    void slt_readyRead();
 
 signals:
     //统计数据信号，发送多少次命令，失败多少次

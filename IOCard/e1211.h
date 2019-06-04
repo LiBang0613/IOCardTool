@@ -10,7 +10,7 @@ public:
     E1211();
     ~E1211();
 protected:
-    bool Query_Read(QByteArray& sendBuf,int& nlen);
+    bool Query_Read(QByteArray& sendBuf, int& nLen);
     bool Response_Read(QByteArray recvBuf,int nLen);
     bool Query_Write(QByteArray& sendBuf,int& nlen);
     bool Response_Write(QByteArray recvBuf, int nLen);

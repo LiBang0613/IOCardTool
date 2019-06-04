@@ -37,3 +37,4 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     multipleset.ui \
     daqset.ui
+

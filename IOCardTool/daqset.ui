@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>425</width>
-    <height>295</height>
+    <width>555</width>
+    <height>370</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -286,6 +286,13 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pb_deleteInfo">
+       <property name="text">
+        <string>删除</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="1" column="0">
@@ -344,6 +351,11 @@
      <column>
       <property name="text">
        <string>时间间隔</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>通道数</string>
       </property>
      </column>
      <column>

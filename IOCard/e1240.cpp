@@ -68,7 +68,7 @@ void E1240::Process()
     int nSendLen = 0;
     Query_Read(sendArray,nSendLen);
     m_sendArray = sendArray;
-    qDebug()<<"1240"<<QThread::currentThreadId()<<m_sendArray<<m_sendArray.size();
+//    qDebug()<<"1240"<<QThread::currentThreadId()<<m_sendArray<<m_sendArray.size();
     m_qTcpSocket->write(sendArray);
     m_nSendTimes++;
     if(nSendLen != sendArray.size())
@@ -84,7 +84,7 @@ void E1240::slt_readyRead()
 
     QByteArray recvArray = m_qTcpSocket->readAll();
     Response_Read(recvArray,recvArray.size());
-    qDebug()<<"1240"<<QThread::currentThreadId()<<recvArray<<recvArray.size();
+//    qDebug()<<"1240"<<QThread::currentThreadId()<<recvArray<<recvArray.size();
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
-    emit sig_sendRecv(m_strIp,m_sendArray,recvArray);
+    emit sig_sendRecv(m_strIp+" type:1240",m_sendArray,recvArray);
 }

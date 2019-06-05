@@ -12,8 +12,8 @@ IOCard::IOCard()
     m_pThread = new QThread;
     connect(m_pThread,SIGNAL(finished()),m_pThread,SLOT(deleteLater()));
     connect(&m_cycleTimer,SIGNAL(timeout()),this,SLOT(slt_ProThread()),Qt::QueuedConnection);
-    connect(this,SIGNAL(sig_newSocket()),this,SLOT(slt_newSocket()));
-    connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread()));
+    connect(this,SIGNAL(sig_newSocket()),this,SLOT(slt_newSocket()),Qt::QueuedConnection);
+    connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread()),Qt::QueuedConnection);
 }
 
 IOCard::~IOCard()
@@ -60,6 +60,11 @@ void IOCard::stopThread()
 {
     emit sig_stopThread();
     m_cycleTimer.stop();
+    if(m_pThread->isRunning())
+    {
+        m_pThread->quit();
+        m_pThread->wait();
+    }
 }
 
 void IOCard::setTimeInterval(int second)
@@ -79,7 +84,6 @@ void IOCard::slt_recvSocketState(QAbstractSocket::SocketState state)
 
 void IOCard::slt_ProThread()
 {
-    qDebug()<<"id"<<QThread::currentThreadId();
     Process();
 }
 
@@ -100,12 +104,6 @@ void IOCard::slt_stopThread()
 {
     if(m_qTcpSocket->state() == QTcpSocket::ConnectedState)
         m_qTcpSocket->disconnectFromHost();
-
-    if(m_pThread->isRunning())
-    {
-        m_pThread->quit();
-        m_pThread->wait();
-    }
 }
 
 void IOCard::slt_tcpDisConnected()

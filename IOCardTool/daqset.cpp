@@ -52,15 +52,18 @@ void DaqSet::on_pb_saveInfo_clicked()
     QString ip = getIpAddr();
     ui->table_Msg->setItem(row,2,new QTableWidgetItem(ip));
     ui->table_Msg->setItem(row,3,new QTableWidgetItem(ui->le_timeInterval->text().trimmed()));
+    ui->table_Msg->setItem(row,4,new QTableWidgetItem(QString::number(ui->sb_pass->value())));
     ui->table_Msg->horizontalHeader()->show();
 }
 
 void DaqSet::on_pb_start_clicked()
 {
-    qDebug()<<ui->table_Msg->currentRow();
     if(ui->table_Msg->currentRow() != -1)
     {
         QString ip = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
+        QString cardType = ui->table_Msg->item(ui->table_Msg->currentRow(),1)->text();
+        int interval = ui->table_Msg->item(ui->table_Msg->currentRow(),3)->text().toInt();
+        int count = ui->table_Msg->item(ui->table_Msg->currentRow(),4)->text().toInt();
         if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime.value(ip).bJudge == true)
         {
             QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
@@ -68,21 +71,21 @@ void DaqSet::on_pb_start_clicked()
         }
         RunTime time;
         time.bJudge = true;
-        time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMDDhhmmss");
+        time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
         m_mapCardRunTime.insert(ip,time);
         IOCard* card;
-        if(ui->comB_cardType->currentText().trimmed() == "1211")
+        if(cardType == "1211")
         {
             card = new E1211;
         }
-        else if(ui->comB_cardType->currentText().trimmed() == "1240")
+        else if(cardType == "1240")
         {
             card = new E1240;
         }
         connect(card,SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)),this,SLOT(slt_recvCardInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
         connect(card,SIGNAL(sig_statisticsCounts(QString,int,int)),this,SLOT(slt_receCardTimes(QString,int,int)),Qt::QueuedConnection);
-        card->setBitCount(ui->sb_pass->value());
-        card->setTimeInterval(ui->le_timeInterval->text().trimmed().toInt());
+        card->setBitCount(count);
+        card->setTimeInterval(interval);
         card->Open(ip);
         card->startThread();
         m_mapIOCardObject.insert(ip,card);
@@ -117,11 +120,7 @@ void DaqSet::slt_clearTxetEdit()
 
 void DaqSet::slt_recvCardInfo(QString ip, QByteArray before, QByteArray after)
 {
-//    QString text = "Ip:"+ip+" send:"+before+" recv:"+after;
-    QString text ;
-    text.sprintf("send:%x recv: %x", ip, before.toHex(), after.toHex());
-    text = ip + text;
-    qDebug()<<"text"<<text<<before.data();
+    QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
     ui->te_showMsg->append((text));
 }
 
@@ -135,11 +134,11 @@ void DaqSet::slt_receCardTimes(QString Ip, int total, int failed)
                     m_mapCardRunTime.value(Ip).bJudge)
             {
                 QDateTime beginTime = QDateTime::fromString(m_mapCardRunTime.value(Ip).strBeginTime,"yyyyMMddhhmmss");
-                int second = QDateTime::currentDateTime().secsTo(beginTime);
-                ui->table_Msg->setItem(i,4,new QTableWidgetItem(QString::number(second)));
+                int second = beginTime.secsTo(QDateTime::currentDateTime());
+                ui->table_Msg->setItem(i,5,new QTableWidgetItem(QString::number(second)));
+                ui->table_Msg->setItem(i,6,new QTableWidgetItem(QString::number(total)));
+                ui->table_Msg->setItem(i,7,new QTableWidgetItem(QString::number(failed)));
             }
-            ui->table_Msg->setItem(i,5,new QTableWidgetItem(QString::number(total)));
-            ui->table_Msg->setItem(i,6,new QTableWidgetItem(QString::number(failed)));
         }
     }
 }
@@ -247,4 +246,25 @@ void DaqSet::initPage()
     ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
     ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
     ui->le_timeInterval->setValidator(new QIntValidator(0,999999,ui->le_timeInterval));
+}
+
+void DaqSet::on_pb_deleteInfo_clicked()
+{
+    if(ui->table_Msg->currentRow() != -1)
+    {
+        QString ip = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
+        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
+        {
+            m_mapCardRunTime.remove(ip);
+            IOCard* card = m_mapIOCardObject.take(ip);
+            card->stopThread();
+            card->deleteLater();
+            card = NULL;
+        }
+        ui->table_Msg->removeRow(ui->table_Msg->currentRow());
+    }
+    else
+    {
+        QMessageBox::information(this,"提示","点击停止前请先选中表格中某行数据。","确定");
+    }
 }

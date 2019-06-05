@@ -61,6 +61,8 @@ private slots:
 
     void on_comB_cardType_currentIndexChanged(const QString &arg1);
 
+    void on_pb_deleteInfo_clicked();
+
 private:
     bool judgeSettingInfo();
     QString getIpAddr();

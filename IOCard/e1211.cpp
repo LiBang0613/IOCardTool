@@ -195,6 +195,7 @@ void E1211::slt_readyRead()
     else
     {
         Response_Read(rcvArray, rcvArray.size());
+
         WriteCmdDO();
     }
 

@@ -4,6 +4,7 @@
 #include <QButtonGroup>
 #define MOXA "MOXA"
 #define SMACQ "Smacq"
+
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
@@ -14,25 +15,19 @@ DaqSet::DaqSet(QWidget *parent) :
     ui(new Ui::DaqSet)
 {
     ui->setupUi(this);
-    QButtonGroup *group1 = new QButtonGroup(this);
-    group1->addButton(ui->rb_Moxa);
-    group1->addButton(ui->rb_smacq);
-
-    QButtonGroup *group2 = new QButtonGroup(this);
-    group2->addButton(ui->rb_485);
-    group2->addButton(ui->rb_net);
-
-    connect(&m_clearTextTimer,SIGNAL(timeout()),this,SLOT(slt_clearTxetEdit()));
-    m_clearTextTimer.start(1000*60*2);
-
-    ui->le_ip1->setValidator(new QIntValidator(0,255,ui->le_ip1));
-    ui->le_ip2->setValidator(new QIntValidator(0,255,ui->le_ip2));
-    ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
-    ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
+    initPage();
 }
 
 DaqSet::~DaqSet()
 {
+    for(auto it=m_mapIOCardObject.begin();it!=m_mapIOCardObject.end();)
+    {
+        it++;
+        QString key;
+        IOCard* card = m_mapIOCardObject.take(key);
+        delete card;
+        card = NULL;
+    }
     delete ui;
 }
 
@@ -71,10 +66,29 @@ void DaqSet::on_pb_start_clicked()
              <<ui->table_Msg->item(ui->table_Msg->currentRow(),3)->text();
 
         QString ip = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
+        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime.value(ip).bJudge == true)
+        {
+            QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
+            return;
+        }
         RunTime time;
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMDDhhmmss");
         m_mapCardRunTime.insert(ip,time);
+        IOCard* card;
+        if(ui->comB_cardType->currentText().trimmed() == "1211")
+        {
+
+        }
+        else if(ui->comB_cardType->currentText().trimmed() == "1240")
+        {
+            card = new E1240;
+        }
+        connect(card,SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)),this,SLOT(slt_recvCardInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
+        connect(card,SIGNAL(sig_statisticsCounts(QString,int,int)),this,SLOT(slt_receCardTimes(QString,int,int)),Qt::QueuedConnection);
+        card->Open(ip);
+        card->startThread();
+        m_mapIOCardObject.insert(ip,card);
     }
     else
     {
@@ -94,6 +108,7 @@ void DaqSet::on_pb_stop_clicked()
         if(m_mapCardRunTime.contains(ip))
         {
             m_mapCardRunTime[ip].bJudge = false;
+            m_mapIOCardObject.value(ip)->stopThread();
         }
     }
     else
@@ -107,10 +122,10 @@ void DaqSet::slt_clearTxetEdit()
     ui->te_showMsg->clear();
 }
 
-void DaqSet::slt_recvCardInfo(QString ip, QString before, QString after)
+void DaqSet::slt_recvCardInfo(QString ip, QByteArray before, QByteArray after)
 {
-    QString text = "Ip:"+ip+" send:"+before+" recv:"+after;
-    ui->te_showMsg->append(text);
+    QByteArray text = "Ip:"+ip.toLatin1()+" send:"+before+" recv:"+after;
+    ui->te_showMsg->append(QString::fromLatin1(text));
 }
 
 void DaqSet::slt_receCardTimes(QString Ip, int total, int failed)
@@ -215,4 +230,23 @@ QString DaqSet::getIpAddr()
     QString ip = ui->le_ip1->text().trimmed()+"."+ui->le_ip2->text().trimmed()+"."
             +ui->le_ip3->text().trimmed()+"."+ui->le_ip4->text().trimmed();
     return ip;
+}
+
+void DaqSet::initPage()
+{
+    QButtonGroup *group1 = new QButtonGroup(this);
+    group1->addButton(ui->rb_Moxa);
+    group1->addButton(ui->rb_smacq);
+
+    QButtonGroup *group2 = new QButtonGroup(this);
+    group2->addButton(ui->rb_485);
+    group2->addButton(ui->rb_net);
+
+    connect(&m_clearTextTimer,SIGNAL(timeout()),this,SLOT(slt_clearTxetEdit()));
+    m_clearTextTimer.start(1000*60*2);
+
+    ui->le_ip1->setValidator(new QIntValidator(0,255,ui->le_ip1));
+    ui->le_ip2->setValidator(new QIntValidator(0,255,ui->le_ip2));
+    ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
+    ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
 }

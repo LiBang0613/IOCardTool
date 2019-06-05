@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <QMap>
+#include "iocard.h"
+#include "e1240.h"
 
 struct DataCardInfo
 {
@@ -47,7 +49,7 @@ private slots:
     void slt_clearTxetEdit();
 
     //接收数采卡对象的发送和接收到的数据，显示在文本区域中。
-    void slt_recvCardInfo(QString ip,QString before,QString after);
+    void slt_recvCardInfo(QString ip,QByteArray before,QByteArray after);
 
     //接收数采卡对象的发送命令的总次数和失败次数的槽函数
     void slt_receCardTimes(QString Ip,int total,int failed);
@@ -61,12 +63,13 @@ private slots:
 private:
     bool judgeSettingInfo();
     QString getIpAddr();
+    void initPage();
 
 private:
     Ui::DaqSet *ui;
     QTimer m_clearTextTimer;                    //清除文本框信息的定时器，信息很多会导致内存上升。
     QMap<QString,RunTime> m_mapCardRunTime;     //记录数采卡开始的时间，用于更新数采卡连接总时间。
-//    QMap<QString,IOCard*>m_mapIOCardObject;   //保存数采卡对象，key=ip，
+    QMap<QString,IOCard*>m_mapIOCardObject;   //保存数采卡对象，key=ip，
 };
 
 #endif // DAQSET_H

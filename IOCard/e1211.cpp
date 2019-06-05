@@ -2,7 +2,8 @@
 
 E1211::E1211()
 {
-
+    m_bMarkState = false;
+    m_bWriteDO = false;
 }
 
 E1211::~E1211()
@@ -113,7 +114,10 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
 {
     // 1. 接收长度校验
     if ( nLen != 0x05 + 0x06 + 0x01)
+    {
+        m_nFailedTimes++;
         return false; // 接收不正确
+    }
 
     // 2. 功能码+数据长度校验
     if ( recvBuf[6].operator !=(0x01)
@@ -121,9 +125,10 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
          || recvBuf[8].operator !=(0x00)
          //	  || recvBuf[9].operator !=(0x00)
          || recvBuf[10].operator !=(0x00)
-         || recvBuf[11].operator !=(m_nBitCount)
+         || recvBuf[11].operator !=(m_ctrlDO.nRegCount)
          )
     { // 接收不正确
+        m_nFailedTimes++;
         return false;
     }
 
@@ -138,17 +143,20 @@ void E1211::Process()
     QMutex mutex;
     mutex.lock();
 
-//    QByteArray sendArray;
+    QByteArray sendArray;
     int nLen = 0;
 
     if(m_ctrlDO.wState != wsEnd)
     {
-        m_bWriteDO = Query_Write(m_sendArray, nLen);
+        m_bWriteDO = Query_Write(sendArray, nLen);
     }
     else
-        Query_Read(m_sendArray, nLen);
+        Query_Read(sendArray, nLen);
 
-    m_qTcpSocket->write(m_sendArray);
+    m_qTcpSocket->write(sendArray);
+    m_nSendTimes++;
+
+    m_sendArray = sendArray;
 
     mutex.unlock();
 
@@ -159,6 +167,7 @@ void E1211::WriteCmdDO()
     if(m_bMarkState)
     {
         m_ctrlDO.wCmd = 0;
+        m_bMarkState = false;
     }
     else
     {
@@ -166,7 +175,7 @@ void E1211::WriteCmdDO()
         {
             m_ctrlDO.wCmd |= 1 << i;
         }
-
+        m_bMarkState = true;
     }
     m_ctrlDO.wState = wsIni;
 }
@@ -176,14 +185,18 @@ void E1211::slt_readyRead()
     //父类的接口，数采卡返回数据响应的槽函数
     QByteArray rcvArray = m_qTcpSocket->readAll();
 
-    if(m_bWriteDO)
+//    if(m_bWriteDO)
+    if(rcvArray[7].operator ==(0x0f))
     {
         m_ctrlDO.wState = wsReady;
         Response_Write(rcvArray, rcvArray.size());
         m_bWriteDO = false;
     }
     else
+    {
         Response_Read(rcvArray, rcvArray.size());
+        WriteCmdDO();
+    }
 
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp,m_sendArray,rcvArray);

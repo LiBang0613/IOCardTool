@@ -10,6 +10,13 @@ E1211::~E1211()
 
 }
 
+void E1211::setBitCount(int nCount)
+{
+    m_ctrlDO.nRegAddr = 0;
+    m_ctrlDO.nRegCount = nCount;
+    m_ctrlDO.wCmd = 0;
+}
+
 bool E1211::Query_Read(QByteArray &sendBuf, int &nLen)
 {
     int i = 0;
@@ -56,9 +63,10 @@ bool E1211::Response_Read(QByteArray recvBuf, int nLen)
 
 bool E1211::Query_Write(QByteArray &sendBuf, int &nLen)
 {
-    int  nCount = m_nBitCount;
+    int  nCount = m_ctrlDO.nRegCount;
 
-    ushort wDO = 0;//命令值
+    ushort wDO = m_ctrlDO.wCmd;//命令值
+    int nReg = m_ctrlDO.nRegAddr;
     char cHigh = 0x00;
     char cLow  = 0x00;
     cHigh = wDO >> 8;
@@ -85,7 +93,7 @@ bool E1211::Query_Write(QByteArray &sendBuf, int &nLen)
     sendBuf[i++] = 0x0F;	// Byte 0: FC = 0F (hex)
 
     sendBuf[i++] = 0x00;	// Byte 1-2: Reference number
-    sendBuf[i++] = 0x00;	// 8bit 一组
+    sendBuf[i++] = nReg;	// 8bit 一组
 
     sendBuf[i++] = 0x00;	// Byte 3-4: Bit count (1-800)
     sendBuf[i++] = nCount;
@@ -118,6 +126,10 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
     { // 接收不正确
         return false;
     }
+
+    if(m_ctrlDO.wState == wsReady)
+        m_ctrlDO.wState = wsEnd;
+
     return true;
 }
 
@@ -126,16 +138,54 @@ void E1211::Process()
     QMutex mutex;
     mutex.lock();
 
-    QByteArray sendArray;
+//    QByteArray sendArray;
     int nLen = 0;
 
+    if(m_ctrlDO.wState != wsEnd)
+    {
+        m_bWriteDO = Query_Write(m_sendArray, nLen);
+    }
+    else
+        Query_Read(m_sendArray, nLen);
 
+    m_qTcpSocket.write(m_sendArray);
 
     mutex.unlock();
 
 }
 
+void E1211::WriteCmdDO()
+{
+    if(m_bMarkState)
+    {
+        m_ctrlDO.wCmd = 0;
+    }
+    else
+    {
+        for(int i = 0; i < m_ctrlDO.nRegCount; i++)
+        {
+            m_ctrlDO.wCmd |= 1 << i;
+        }
+
+    }
+    m_ctrlDO.wState = wsIni;
+}
+
 void E1211::slt_readyRead()
 {
     //父类的接口，数采卡返回数据响应的槽函数
+    QByteArray rcvArray = m_qTcpSocket.readAll();
+
+    if(m_bWriteDO)
+    {
+        m_ctrlDO.wState = wsReady;
+        Response_Write(rcvArray, rcvArray.size());
+        m_bWriteDO = false;
+    }
+    else
+        Response_Read(rcvArray, rcvArray.size());
+
+    emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
+    emit sig_sendRecv(m_strIp,m_sendArray,rcvArray);
+
 }

@@ -7,6 +7,32 @@
 #include <QThread>
 #include <QTimer>
 
+enum WriteState
+{
+     wsIni = 1
+    ,wsReady = 2
+    ,wsEnd = 3
+};
+struct CtrlDO
+{
+    unsigned short	wID;		// 组ID标识
+    int		nRegAddr;
+    int		nRegCount;
+
+    unsigned short	wCmd;		// 命令值
+    WriteState	wState;		// 写操作-状态
+
+public:
+    CtrlDO()
+    {
+        wID			= 0;		// 组ID标识
+        nRegAddr	= 0;
+        nRegCount	= 0;
+
+        wCmd		= 0;		// 命令值
+        wState		= wsEnd;	// 写操作状态标记
+    }
+};
 class IOCARDSHARED_EXPORT IOCard : public QObject
 {
     Q_OBJECT
@@ -17,7 +43,7 @@ public:
     //连接指定Ip地址
     bool Open(QString strIp,uint nPort = 502);
     //设置读写寄存器 /线圈数量
-    void setBitCount(int nCount);
+    virtual void setBitCount(int nCount);
     //启动通讯线程
     void startThread();
     //停止通讯线程
@@ -31,9 +57,9 @@ protected:
 protected slots:
     void slt_tcpConnected();
     void slt_recvSocketState(QAbstractSocket::SocketState state);
-    virtual void slt_readyRead() = 0;
-    void slt_cycleSendInfo();
     void slt_tcpDisConnected();
+    virtual void slt_readyRead() = 0;
+    void slt_ProThread();
 
 signals:
     //统计数据信号，发送多少次命令，失败多少次
@@ -50,6 +76,9 @@ protected:
     int m_nFailedTimes;
     int m_nTimeInterval;
     QTimer m_cycleTimer;
+public:
+    QByteArray m_sendArray;
+
 };
 
 #endif // IOCARD_H

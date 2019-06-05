@@ -36,3 +36,10 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+Debug:{
+    DESTDIR += ../exe/debug
+}
+
+Release:{
+    DESTDIR += ../exe/release
+}

@@ -16,7 +16,9 @@ protected:
     void Process();
 
 protected slots:
-    void slt_readyead();
+    void slt_readyRead();
+private:
+    QByteArray m_sendArray;
 };
 
 #endif // E1240_H

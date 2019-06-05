@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMessageBox>
+#include "daqset.h"
 enum DeviceType
 {
     dtDevice1 = 0,			//仪器1根据需求暂定2个1211和1个1240
@@ -10,7 +11,6 @@ enum DeviceType
     dtDevice3 = 2,			//仪器3根据需求暂定3个1240
     dtDevice4 = 3,			//仪器4根据需求暂定2个1240和1个1211
 };
-
 
 namespace Ui {
 class MultipleSet;
@@ -38,6 +38,8 @@ private:
     QString getIpAddr();
 private:
     Ui::MultipleSet *ui;
+
+    QMap<QString,RunTime> m_mapCardRunTime;
 
 };
 

@@ -60,6 +60,8 @@ protected slots:
     void slt_tcpDisConnected();
     virtual void slt_readyRead() = 0;
     void slt_ProThread();
+    void slt_newSocket();
+    void slt_stopThread();
 
 signals:
     //统计数据信号，发送多少次命令，失败多少次
@@ -67,9 +69,13 @@ signals:
     //发送内容信号
     void sig_sendRecv(QString,QByteArray,QByteArray);
 
+    void sig_newSocket();
+
+    void sig_stopThread();
+
 protected:
     QThread *m_pThread;
-    QTcpSocket m_qTcpSocket;
+    QTcpSocket *m_qTcpSocket;
     QString m_strIp;
     int m_nBitCount;
     int m_nSendTimes;
@@ -78,6 +84,9 @@ protected:
     QTimer m_cycleTimer;
 public:
     QByteArray m_sendArray;
+
+private:
+    bool m_bNewSocket;
 
 };
 

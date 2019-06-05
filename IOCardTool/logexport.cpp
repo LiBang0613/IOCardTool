@@ -12,7 +12,6 @@ LogExport::LogExport()
 {
     m_iSaveDays     = -1;
     m_iFileMaxSize = 1024*1024*7;
-    qDebug()<<m_iFileMaxSize;
     m_strLocalPath    = qApp->applicationDirPath()+"/Log/";
     QDir dir(m_strLocalPath);
     if(!dir.exists())

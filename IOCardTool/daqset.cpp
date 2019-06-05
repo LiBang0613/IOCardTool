@@ -60,11 +60,6 @@ void DaqSet::on_pb_start_clicked()
     qDebug()<<ui->table_Msg->currentRow();
     if(ui->table_Msg->currentRow() != -1)
     {
-        qDebug()<<ui->table_Msg->item(ui->table_Msg->currentRow(),0)->text()
-               <<ui->table_Msg->item(ui->table_Msg->currentRow(),1)->text()
-              <<ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text()
-             <<ui->table_Msg->item(ui->table_Msg->currentRow(),3)->text();
-
         QString ip = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
         if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime.value(ip).bJudge == true)
         {
@@ -78,7 +73,7 @@ void DaqSet::on_pb_start_clicked()
         IOCard* card;
         if(ui->comB_cardType->currentText().trimmed() == "1211")
         {
-
+            card = new E1211;
         }
         else if(ui->comB_cardType->currentText().trimmed() == "1240")
         {
@@ -86,6 +81,8 @@ void DaqSet::on_pb_start_clicked()
         }
         connect(card,SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)),this,SLOT(slt_recvCardInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
         connect(card,SIGNAL(sig_statisticsCounts(QString,int,int)),this,SLOT(slt_receCardTimes(QString,int,int)),Qt::QueuedConnection);
+        card->setBitCount(ui->sb_pass->value());
+        card->setTimeInterval(ui->le_timeInterval->text().trimmed().toInt());
         card->Open(ip);
         card->startThread();
         m_mapIOCardObject.insert(ip,card);
@@ -100,12 +97,8 @@ void DaqSet::on_pb_stop_clicked()
 {
     if(ui->table_Msg->currentRow() != -1)
     {
-        qDebug()<<ui->table_Msg->item(ui->table_Msg->currentRow(),0)->text()
-               <<ui->table_Msg->item(ui->table_Msg->currentRow(),1)->text()
-              <<ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text()
-             <<ui->table_Msg->item(ui->table_Msg->currentRow(),3)->text();
         QString ip = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
-        if(m_mapCardRunTime.contains(ip))
+        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
         {
             m_mapCardRunTime[ip].bJudge = false;
             m_mapIOCardObject.value(ip)->stopThread();
@@ -124,8 +117,12 @@ void DaqSet::slt_clearTxetEdit()
 
 void DaqSet::slt_recvCardInfo(QString ip, QByteArray before, QByteArray after)
 {
-    QByteArray text = "Ip:"+ip.toLatin1()+" send:"+before+" recv:"+after;
-    ui->te_showMsg->append(QString::fromLatin1(text));
+//    QString text = "Ip:"+ip+" send:"+before+" recv:"+after;
+    QString text ;
+    text.sprintf("send:%x recv: %x", ip, before.toHex(), after.toHex());
+    text = ip + text;
+    qDebug()<<"text"<<text<<before.data();
+    ui->te_showMsg->append((text));
 }
 
 void DaqSet::slt_receCardTimes(QString Ip, int total, int failed)
@@ -249,4 +246,5 @@ void DaqSet::initPage()
     ui->le_ip2->setValidator(new QIntValidator(0,255,ui->le_ip2));
     ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
     ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
+    ui->le_timeInterval->setValidator(new QIntValidator(0,999999,ui->le_timeInterval));
 }

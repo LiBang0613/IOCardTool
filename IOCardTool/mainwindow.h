@@ -19,15 +19,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
-    void slt_connected();
-    void slt_readyRead();
-    void slt_recvSocketState(QAbstractSocket::SocketState);
-
 private:
     Ui::MainWindow *ui;
-    QTcpSocket* m_tcpSocket;
-    QByteArray array;
 
     DaqSet* m_daqSetPage;
     MultipleSet* m_multipltSetPage;

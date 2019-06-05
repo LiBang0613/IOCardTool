@@ -56,12 +56,39 @@ void MultipleSet::on_pb_saveInfo_clicked()
 
 void MultipleSet::on_pb_start_clicked()
 {
-
+    if(ui->table_Info->currentRow() != -1)
+    {
+        QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
+        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime.value(ip).bJudge == true)
+        {
+            QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
+            return;
+        }
+        RunTime time;
+        time.bJudge = true;
+        time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMDDhhmmss");
+        m_mapCardRunTime.insert(ip,time);
+    }
+    else
+    {
+        QMessageBox::information(this,"提示","点击开始前请先选中表格中某行数据。","确定");
+    }
 }
 
 void MultipleSet::on_pb_stop_clicked()
 {
-
+    if(ui->table_Info->currentRow() != -1)
+    {
+        QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
+        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
+        {
+            m_mapCardRunTime[ip].bJudge = false;
+        }
+    }
+    else
+    {
+        QMessageBox::information(this,"提示","点击停止前请先选中表格中某行数据。","确定");
+    }
 }
 
 void MultipleSet::slt_clearTextEdit()

@@ -8,6 +8,7 @@
 #include <QMap>
 #include "iocard.h"
 #include "e1240.h"
+#include "e1211.h"
 
 struct DataCardInfo
 {

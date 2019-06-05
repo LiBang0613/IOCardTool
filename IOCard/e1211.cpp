@@ -148,7 +148,7 @@ void E1211::Process()
     else
         Query_Read(m_sendArray, nLen);
 
-    m_qTcpSocket.write(m_sendArray);
+    m_qTcpSocket->write(m_sendArray);
 
     mutex.unlock();
 
@@ -174,7 +174,7 @@ void E1211::WriteCmdDO()
 void E1211::slt_readyRead()
 {
     //父类的接口，数采卡返回数据响应的槽函数
-    QByteArray rcvArray = m_qTcpSocket.readAll();
+    QByteArray rcvArray = m_qTcpSocket->readAll();
 
     if(m_bWriteDO)
     {

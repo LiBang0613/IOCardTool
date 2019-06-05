@@ -73,6 +73,7 @@ signals:
 
     void sig_stopThread();
 
+    void sig_operate();
 protected:
     QThread *m_pThread;
     QTcpSocket *m_qTcpSocket;
@@ -87,6 +88,8 @@ public:
 
 private:
     bool m_bNewSocket;
+
+    bool m_bExitThread;
 
 };
 

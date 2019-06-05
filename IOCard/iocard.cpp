@@ -3,6 +3,7 @@
 
 IOCard::IOCard()
 {
+    qDebug()<<"main"<<QThread::currentThreadId();
     qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
     m_nBitCount = 0;
     m_nSendTimes = 0;
@@ -10,10 +11,15 @@ IOCard::IOCard()
     m_nTimeInterval = 1000;
     m_bNewSocket = false;
     m_pThread = new QThread;
+
+    m_bExitThread = false;
+
     connect(m_pThread,SIGNAL(finished()),m_pThread,SLOT(deleteLater()));
     connect(&m_cycleTimer,SIGNAL(timeout()),this,SLOT(slt_ProThread()),Qt::QueuedConnection);
     connect(this,SIGNAL(sig_newSocket()),this,SLOT(slt_newSocket()),Qt::QueuedConnection);
     connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread()),Qt::QueuedConnection);
+
+    connect(this, SIGNAL(sig_operate()), this, SLOT(slt_ProThread()), Qt::QueuedConnection);
 }
 
 IOCard::~IOCard()
@@ -53,11 +59,14 @@ void IOCard::setBitCount(int nCount)
 
 void IOCard::startThread()
 {
-    m_cycleTimer.start(m_nTimeInterval);
+//    m_cycleTimer.start(m_nTimeInterval);
+    m_bExitThread = false;
+    emit sig_operate();
 }
 
 void IOCard::stopThread()
 {
+    m_bExitThread = true;
     emit sig_stopThread();
     m_cycleTimer.stop();
     if(m_pThread->isRunning())
@@ -75,6 +84,7 @@ void IOCard::setTimeInterval(int second)
 void IOCard::slt_tcpConnected()
 {
     qDebug()<<"connected success";
+
 }
 
 void IOCard::slt_recvSocketState(QAbstractSocket::SocketState state)
@@ -84,7 +94,11 @@ void IOCard::slt_recvSocketState(QAbstractSocket::SocketState state)
 
 void IOCard::slt_ProThread()
 {
-    Process();
+    qDebug()<<"slt_proThread"<<QThread::currentThreadId()<<m_qTcpSocket->state();
+    while(!m_bExitThread)
+    {
+        Process();
+    }
 }
 
 void IOCard::slt_newSocket()
@@ -96,6 +110,8 @@ void IOCard::slt_newSocket()
     connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
 
     m_qTcpSocket->connectToHost(m_strIp,502);
+    m_qTcpSocket->waitForConnected();
+    qDebug()<<m_qTcpSocket->state();
     m_bNewSocket = true;
 
 }

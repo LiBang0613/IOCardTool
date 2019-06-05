@@ -140,6 +140,7 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
 
 void E1211::Process()
 {
+    QThread::msleep(m_nTimeInterval);
     QMutex mutex;
     mutex.lock();
 
@@ -158,6 +159,11 @@ void E1211::Process()
 
     m_sendArray = sendArray;
 
+    if(m_qTcpSocket->waitForReadyRead() == false)
+    {
+        return ;
+    }
+    slt_readyRead();
     mutex.unlock();
 
 }
@@ -198,7 +204,6 @@ void E1211::slt_readyRead()
 
         WriteCmdDO();
     }
-
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:1211",m_sendArray,rcvArray);
 

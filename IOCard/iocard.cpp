@@ -110,7 +110,7 @@ void IOCard::slt_newSocket()
     connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
 
     m_qTcpSocket->connectToHost(m_strIp,502);
-    if(m_qTcpSocket->waitForConnected())
+    if(!m_qTcpSocket->waitForConnected(5000))
     {
         stopThread();
         emit sig_connectFailed();

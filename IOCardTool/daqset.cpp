@@ -84,6 +84,7 @@ void DaqSet::on_pb_start_clicked()
         }
         connect(card,SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)),this,SLOT(slt_recvCardInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
         connect(card,SIGNAL(sig_statisticsCounts(QString,int,int)),this,SLOT(slt_receCardTimes(QString,int,int)),Qt::QueuedConnection);
+        connect(card,SIGNAL(sig_connectFailed()),this,SLOT(slt_recvConnectFailed()),Qt::QueuedConnection);
         card->setBitCount(count);
         card->setTimeInterval(interval);
         card->Open(ip);
@@ -267,4 +268,9 @@ void DaqSet::on_pb_deleteInfo_clicked()
     {
         QMessageBox::information(this,"提示","点击停止前请先选中表格中某行数据。","确定");
     }
+}
+
+void DaqSet::slt_recvConnectFailed()
+{
+    QMessageBox::information(this,"提示","连接失败，请检查连接。","确定");
 }

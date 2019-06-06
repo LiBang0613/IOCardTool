@@ -13,6 +13,7 @@ LogExport::LogExport()
     m_iSaveDays     = -1;
     m_iFileMaxSize = 1024*1024*7;
     m_strLocalPath    = qApp->applicationDirPath()+"/Log/";
+    m_nFileCount = 0;
     QDir dir(m_strLocalPath);
     if(!dir.exists())
     {
@@ -43,6 +44,23 @@ void LogExport::slt_receiveLog(const QByteArray &info, const int &type)
 {
     m_logMutex.lock();
     updateCurrentFileName((LogType)type);
+
+    QFile file(m_strCurrentFileName);
+    qDebug()<<m_strCurrentFileName<<m_iFileMaxSize<<file.size()<<"---------";
+    if(file.open(QFile::WriteOnly | QFile::Append | QFile::Text))
+    {
+        file.write(info);
+        file.write("\n");
+    }
+    file.flush();
+    file.close();
+    m_logMutex.unlock();
+}
+
+void LogExport::slt_receiveLog(const QByteArray & info, const QString &name)
+{
+    m_logMutex.lock();
+    updateCurrentFileName(name);
 
     QFile file(m_strCurrentFileName);
     qDebug()<<m_strCurrentFileName<<m_iFileMaxSize<<file.size()<<"---------";
@@ -118,6 +136,28 @@ void LogExport::updateCurrentFileName(LogType type)
     }
 }
 
+void LogExport::updateCurrentFileName(QString name)
+{
+    QString suffix = name;
+
+    if(m_strCurrentLogDate != QDateTime::currentDateTime().toString("yyyyMMdd"))
+    {
+        m_strCurrentLogDate = QDateTime::currentDateTime().toString("yyyyMMdd");
+        m_nFileCount = 0;
+    }
+
+    m_strCurrentFileName = m_strLocalPath + m_strCurrentLogDate+"_"+
+            QString("%1").arg(m_nFileCount,3,10,QLatin1Char('0'))+"_"+suffix+".log";
+
+    QFile file(m_strCurrentFileName);
+    if(file.size() >= m_iFileMaxSize)
+    {
+        m_nFileCount++;
+        m_strCurrentFileName = m_strLocalPath + m_strCurrentLogDate+"_"+
+                QString("%1").arg(m_nFileCount,3,10,QLatin1Char('0'))+"_"+suffix+".log";
+    }
+}
+
 
 ManageLog::ManageLog()
 {
@@ -148,6 +188,7 @@ ManageLog* ManageLog::getLogExport()
     {
         m_manageLog = new ManageLog;
         connect(m_manageLog,SIGNAL(sig_receiveLog(QByteArray,int)),m_logExport,SLOT(slt_receiveLog(QByteArray,int)),Qt::QueuedConnection);
+        connect(m_manageLog,SIGNAL(sig_receiveLog(QByteArray,QString)),m_logExport,SLOT(slt_receiveLog(QByteArray,QString)),Qt::QueuedConnection);
     }
 
     startExportThread();
@@ -216,6 +257,46 @@ bool ManageLog::printLog(LogLevel level, LogType type, QString log)
     return true;
 }
 
+bool ManageLog::printLog(LogLevel level, QString name, QString log)
+{
+    if(m_logExport == nullptr)
+    {
+        return false;
+    }
+    if(level < m_iLogLevel)
+    {
+        return false;
+    }
+    QByteArray array;
+    array.append(QDateTime::currentDateTime().toString("[yyyy-MM-dd hh:mm:ss:zzz]"));
+    switch (level)
+    {
+    case debug:
+    {
+        array.append("<debug> ");
+        break;
+    }
+    case info:
+        array.append("<info> ");
+        break;
+    case warn:
+        array.append("<warning> ");
+        break;
+    case err:
+        array.append("<error> ");
+        break;
+    case critical:
+        array.append("<critical> ");
+        break;
+    }
+    array.append(log);
+    if(m_manageLog!=NULL)
+    {
+        m_manageLog->sendReceiveLogSig(array,name);
+    }
+    return true;
+}
+
 void ManageLog::deleteManageLog()
 {
     if(m_exportThread!=NULL)
@@ -253,5 +334,10 @@ void ManageLog::setLogSaveDays(const int& nDays)
 void ManageLog::sendReceiveLogSig(const QByteArray &info, const int &type)
 {
     emit sig_receiveLog(info,type);
+}
+
+void ManageLog::sendReceiveLogSig(const QByteArray &info, const QString &name)
+{
+    emit sig_receiveLog(info,name);
 }
 

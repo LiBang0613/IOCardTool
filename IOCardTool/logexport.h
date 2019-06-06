@@ -40,12 +40,14 @@ public:
 private slots:
     //接收从ManageLog管理类发送的日志文件类型和日志内容的槽函数，并将日志内容写入文件中。
     void slt_receiveLog(const QByteArray &, const int &);
+    void slt_receiveLog(const QByteArray &, const QString  &);
     //ManageLog管理类删除文件定时器的槽函数。
     void slt_deleteTimeOut();
 
 private:
     //更新当前文件的路径，根据不同日志文件类型。
     void updateCurrentFileName(LogType type);
+    void updateCurrentFileName(QString name);
 
 private:
     QMutex  m_logMutex;//加锁避免多线程同时写文件异常
@@ -55,6 +57,8 @@ private:
     int m_iFileMaxSize;//每个日志文件的最大大小
     int m_iSaveDays;    //日志文件保存的时常，单位是天
     QMap<LogType,int> m_mapLogFileCount;//保存当前不同类型日志的点击文件计数
+
+    int m_nFileCount;
 };
 
 
@@ -66,6 +70,7 @@ public:
     static ManageLog *getLogExport();
     //打印日志的接口
     static bool printLog(LogLevel level,LogType type, QString log);
+    static bool printLog(LogLevel level,QString name, QString log);
     //外部调用释放资源的接口
     static void deleteManageLog();
 
@@ -85,12 +90,14 @@ private:
 signals:
     //发送日志信息和日志类型的信号。
     void sig_receiveLog(QByteArray,int);
+    void sig_receiveLog(QByteArray,QString);
 
 private:
     //实例化LogExport类的线程，并通过信号槽方式调用线程完毕自动删除线程的连接。
     static void startExportThread();
     //发送日志等级信息给LogExport，通过信号槽方式发送
     void sendReceiveLogSig(const QByteArray &info,const int &type);
+    void sendReceiveLogSig(const QByteArray &info,const QString &name);
 
 private:
     static LogExport *m_logExport;//日志输出类的对象

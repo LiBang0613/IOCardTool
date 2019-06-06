@@ -63,6 +63,8 @@ private slots:
 
     void on_pb_deleteInfo_clicked();
 
+    void slt_recvConnectFailed();
+
 private:
     bool judgeSettingInfo();
     QString getIpAddr();

@@ -74,6 +74,8 @@ signals:
     void sig_stopThread();
 
     void sig_operate();
+
+    void sig_connectFailed();
 protected:
     QThread *m_pThread;
     QTcpSocket *m_qTcpSocket;

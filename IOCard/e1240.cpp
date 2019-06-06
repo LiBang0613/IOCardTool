@@ -63,7 +63,7 @@ bool E1240::Response_Read(QByteArray recvBuf, int nLen)
 
 void E1240::Process()
 {
-    QThread::sleep(m_nTimeInterval);
+    QThread::msleep(m_nTimeInterval);
     QByteArray sendArray;
     int nSendLen = 0;
     Query_Read(sendArray,nSendLen);
@@ -81,6 +81,7 @@ void E1240::Process()
         return ;
     }
 
+    slt_readyRead();
 }
 
 void E1240::slt_readyRead()

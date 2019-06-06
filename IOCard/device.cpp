@@ -38,7 +38,7 @@ bool Device::Open(QString strIP)
 
         card->Open(vctIP[i]);
         card->startThread();
-        m_vctE1240.push_back(*card);
+        m_vctE1240.push_back(card);
     }
     for(int i = 0; i < m_nCountDO; i++)
     {
@@ -50,7 +50,7 @@ bool Device::Open(QString strIP)
         connect(card, SIGNAL(sig_connectFailed(QString)), this, SIGNAL(sig_connectfailed(QString)), Qt::QueuedConnection);
         card->Open(vctIP[i]);
         card->startThread();
-        m_vctE1211.push_back(*card);
+        m_vctE1211.push_back(card);
     }
 
     return true;
@@ -59,10 +59,10 @@ bool Device::Open(QString strIP)
 bool Device::Close()
 {
     for(int i = 0; i < m_nCountAI; i++)
-        m_vctE1240[i].stopThread();
+        m_vctE1240[i]->stopThread();
 
     for(int i = 0; i < m_nCountDO; i++)
-        m_vctE1211[i].stopThread();
+        m_vctE1211[i]->stopThread();
 
     return true;
 }

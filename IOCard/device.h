@@ -29,8 +29,8 @@ public:
     int m_nCountAI;
 
 private:
-    QVector<E1211> m_vctE1211;
-    QVector<E1240> m_vctE1240;
+    QVector<E1211*> m_vctE1211;
+    QVector<E1240*> m_vctE1240;
 };
 
 #endif // DEVICE_H

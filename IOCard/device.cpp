@@ -4,6 +4,9 @@ Device::Device()
 {
     m_nCountAI = 0;
     m_nCountDO = 0;
+
+    m_nTotalCount = 0;
+    m_nFailedCount = 0;
 }
 
 Device::~Device()
@@ -48,7 +51,7 @@ bool Device::Open(QString strIP)
         connect(card, SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)), this, SLOT(slt_IObuf(QString,QByteArray,QByteArray)), Qt::QueuedConnection);
         connect(card, SIGNAL(sig_statisticsCounts(QString,int,int)), this, SLOT(slt_IOCount(QString,int,int)), Qt::QueuedConnection);
         connect(card, SIGNAL(sig_connectFailed(QString)), this, SIGNAL(sig_connectfailed(QString)), Qt::QueuedConnection);
-        card->Open(vctIP[i]);
+        card->Open(vctIP[i + m_nCountAI]);
         card->startThread();
         m_vctE1211.push_back(card);
     }
@@ -75,7 +78,9 @@ void Device::setDeviceCount(int nDO, int nAI)
 
 void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
 {
-    emit sig_IOCount(strIP, nTotalCount, nFailedCount);
+    m_nTotalCount += nTotalCount;
+    m_nFailedCount += nFailedCount;
+    emit sig_IOCount(strIP, m_nTotalCount, m_nFailedCount);
 }
 
 void Device::slt_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv)

@@ -4,7 +4,7 @@
 #include "iodevice.h"
 #include "e1211.h"
 #include "e1240.h"
-class Device : public IODevice
+class IOCARDSHARED_EXPORT Device : public IODevice
 {
 public:
     Device();
@@ -17,6 +17,7 @@ public:
     virtual bool Close();
     // 设置设备中IO模块的数量
     virtual void setDeviceCount(int nDO, int nAI); //
+
 protected slots:
     virtual void slt_IOCount(QString strIP, int nTotalCount, int nFailedCount);
     virtual void slt_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv);
@@ -31,6 +32,9 @@ public:
 private:
     QVector<E1211*> m_vctE1211;
     QVector<E1240*> m_vctE1240;
+
+    int m_nTotalCount;
+    int m_nFailedCount;
 };
 
 #endif // DEVICE_H

@@ -44,7 +44,11 @@ bool E1211::Response_Read(QByteArray recvBuf, int nLen)
 {
     // 1. 接收长度校验
     if ( nLen != 0x05 + 0x05 + 0x01)
+    {
+        m_nFailedTimes++;
+        logError(m_strIp,"1211数据长度接收不正确Response_Read");
         return false; // 接收不正确
+    }
 
     // 2. 功能码+数据长度校验
     if ( recvBuf[6].operator !=(0x01)
@@ -52,6 +56,8 @@ bool E1211::Response_Read(QByteArray recvBuf, int nLen)
          || recvBuf[8].operator !=(0x02)
          )
     { // 接收不正确
+        m_nFailedTimes++;
+        logError(m_strIp,"1211功能码接收不正确Response_Read");
         return false;
     }
 
@@ -116,6 +122,7 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
     if ( nLen != 0x05 + 0x06 + 0x01)
     {
         m_nFailedTimes++;
+        logError(m_strIp,"1211数据长度接收不正确Response_Write");
         return false; // 接收不正确
     }
 
@@ -129,6 +136,7 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
          )
     { // 接收不正确
         m_nFailedTimes++;
+        logError(m_strIp,"1211功能码接收不正确Response_Write");
         return false;
     }
 
@@ -191,7 +199,7 @@ void E1211::slt_readyRead()
     //父类的接口，数采卡返回数据响应的槽函数
     QByteArray rcvArray = m_qTcpSocket->readAll();
 
-//    if(m_bWriteDO)
+    //    if(m_bWriteDO)
     if(rcvArray[7].operator ==(0x0f))
     {
         m_ctrlDO.wState = wsReady;
@@ -206,6 +214,6 @@ void E1211::slt_readyRead()
     }
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:1211",m_sendArray,rcvArray);
-    logInfo(m_strIp," type:1211"+(QString)m_sendArray.toHex()+(QString)rcvArray.toHex());
+    logInfo(m_strIp,"type:1211 send:"+(QString)m_sendArray.toHex()+" recv:"+(QString)rcvArray.toHex());
 
 }

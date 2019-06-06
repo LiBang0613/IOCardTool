@@ -94,7 +94,15 @@ void IOCard::slt_ProThread()
     qDebug()<<"slt_proThread"<<QThread::currentThreadId()<<m_qTcpSocket->state();
     while(!m_bExitThread)
     {
-        Process();
+        if(m_qTcpSocket->state() == QTcpSocket::ConnectedState)
+        {
+            Process();
+        }
+        else
+        {
+            stopThread();
+            emit sig_connectFailed(m_strIp);
+        }
     }
 }
 

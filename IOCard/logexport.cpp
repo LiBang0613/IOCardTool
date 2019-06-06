@@ -13,7 +13,6 @@ LogExport::LogExport()
     m_iSaveDays     = -1;
     m_iFileMaxSize = 1024*1024*7;
     m_strLocalPath    = qApp->applicationDirPath()+"/Log/";
-    m_nFileCount = 0;
     QDir dir(m_strLocalPath);
     if(!dir.exists())
     {
@@ -140,21 +139,27 @@ void LogExport::updateCurrentFileName(QString name)
 {
     QString suffix = name;
 
+    if(!m_mapFileCount.contains(name))
+    {
+        m_mapFileCount.insert(name,0);
+    }
     if(m_strCurrentLogDate != QDateTime::currentDateTime().toString("yyyyMMdd"))
     {
         m_strCurrentLogDate = QDateTime::currentDateTime().toString("yyyyMMdd");
-        m_nFileCount = 0;
+        m_mapFileCount[name] = 0;
     }
-
+    int count = m_mapFileCount.value(name);
     m_strCurrentFileName = m_strLocalPath + m_strCurrentLogDate+"_"+
-            QString("%1").arg(m_nFileCount,3,10,QLatin1Char('0'))+"_"+suffix+".log";
+            QString("%1").arg(count,3,10,QLatin1Char('0'))+"_"+suffix+".log";
 
     QFile file(m_strCurrentFileName);
     if(file.size() >= m_iFileMaxSize)
     {
-        m_nFileCount++;
+        int count = m_mapFileCount.value(name);
+        count++;
+        m_mapFileCount.insert(name,count);
         m_strCurrentFileName = m_strLocalPath + m_strCurrentLogDate+"_"+
-                QString("%1").arg(m_nFileCount,3,10,QLatin1Char('0'))+"_"+suffix+".log";
+                QString("%1").arg(count,3,10,QLatin1Char('0'))+"_"+suffix+".log";
     }
 }
 

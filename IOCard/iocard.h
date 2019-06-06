@@ -90,9 +90,7 @@ public:
 
 private:
     bool m_bNewSocket;
-
     bool m_bExitThread;
-
 };
 
 #endif // IOCARD_H

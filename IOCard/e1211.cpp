@@ -163,6 +163,7 @@ void E1211::Process()
         Query_Read(sendArray, nLen);
 
     m_qTcpSocket->write(sendArray);
+    m_qTcpSocket->flush();
     m_nSendTimes++;
 
     m_sendArray = sendArray;

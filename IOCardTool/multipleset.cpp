@@ -59,6 +59,8 @@ void MultipleSet::on_pb_start_clicked()
     if(ui->table_Info->currentRow() != -1)
     {
         QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
+        int nDoCount = ui->table_Info->item(ui->table_Info->currentRow(),2)->text().toInt();
+        int nAiCount = ui->table_Info->item(ui->table_Info->currentRow(),3)->text().toInt();
         if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime.value(ip).bJudge == true)
         {
             QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
@@ -68,6 +70,13 @@ void MultipleSet::on_pb_start_clicked()
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMDDhhmmss");
         m_mapCardRunTime.insert(ip,time);
+        IODevice* pIoDevice = new Device;
+        connect(pIoDevice,SIGNAL(sig_IOCount(QString,int,int)),this,SLOT(slt_receDeviceTimes(QString,int,int)),Qt::QueuedConnection);
+        connect(pIoDevice,SIGNAL(sig_IObuf(QString,QByteArray,QByteArray)),this,SLOT(slt_recvDeviceInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
+        connect(pIoDevice,SIGNAL(sig_connectfailed(QString)),this,SLOT(slt_recvConnectFailed()),Qt::QueuedConnection);
+        pIoDevice->setDeviceCount(nDoCount,nAiCount);
+        pIoDevice->Open(ip);
+        m_mapDeviceObject.insert(ip,pIoDevice);
     }
     else
     {
@@ -94,6 +103,36 @@ void MultipleSet::on_pb_stop_clicked()
 void MultipleSet::slt_clearTextEdit()
 {
     ui->te_showMsg->clear();
+}
+
+void MultipleSet::slt_recvDeviceInfo(QString ip, QByteArray before, QByteArray after)
+{
+    QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
+    ui->te_showMsg->append((text));
+}
+
+void MultipleSet::slt_receDeviceTimes(QString Ip, int total, int failed)
+{
+    for(int i=0;i<ui->table_Info->rowCount();++i)
+    {
+        if(Ip == ui->table_Info->item(i,1)->text())
+        {
+            if(m_mapCardRunTime.contains(Ip) &&
+                    m_mapCardRunTime.value(Ip).bJudge)
+            {
+                QDateTime beginTime = QDateTime::fromString(m_mapCardRunTime.value(Ip).strBeginTime,"yyyyMMddhhmmss");
+                int second = beginTime.secsTo(QDateTime::currentDateTime());
+                ui->table_Info->setItem(i,4,new QTableWidgetItem(QString::number(second)));
+                ui->table_Info->setItem(i,5,new QTableWidgetItem(QString::number(total)));
+                ui->table_Info->setItem(i,6,new QTableWidgetItem(QString::number(failed)));
+            }
+        }
+    }
+}
+
+void MultipleSet::slt_recvConnectFailed()
+{
+
 }
 
 bool MultipleSet::judgeSettingInfo()

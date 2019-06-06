@@ -58,8 +58,8 @@ private:
     int m_iFileMaxSize;//每个日志文件的最大大小
     int m_iSaveDays;    //日志文件保存的时常，单位是天
     QMap<LogType,int> m_mapLogFileCount;//保存当前不同类型日志的点击文件计数
+    QMap<QString,int> m_mapFileCount;
 
-    int m_nFileCount;
 };
 
 

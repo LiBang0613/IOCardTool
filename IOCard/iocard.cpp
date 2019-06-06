@@ -30,6 +30,8 @@ IOCard::~IOCard()
         m_pThread->quit();
         m_pThread->wait();
     }
+    delete m_pThread;
+    delete m_qTcpSocket;
 }
 
 bool IOCard::Open(QString strIp, uint nPort)
@@ -110,7 +112,7 @@ void IOCard::slt_ProThread()
 
 void IOCard::slt_newSocket()
 {
-    m_qTcpSocket = new QTcpSocket(this);
+    m_qTcpSocket = new QTcpSocket;
     connect(m_qTcpSocket,SIGNAL(connected()),this,SLOT(slt_tcpConnected()),Qt::QueuedConnection);
     connect(m_qTcpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(slt_recvSocketState(QAbstractSocket::SocketState)),Qt::QueuedConnection);
     connect(m_qTcpSocket,SIGNAL(readyRead()),this,SLOT(slt_readyRead()),Qt::QueuedConnection);

@@ -1,4 +1,4 @@
-#include "device.h"
+﻿#include "device.h"
 
 Device::Device()
 {

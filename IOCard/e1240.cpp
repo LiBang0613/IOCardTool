@@ -72,6 +72,7 @@ void E1240::Process()
     m_sendArray = sendArray;
 //    qDebug()<<"1240"<<QThread::currentThreadId()<<m_sendArray<<m_sendArray.size();
     m_qTcpSocket->write(sendArray);
+    m_qTcpSocket->flush();
     m_nSendTimes++;
     if(nSendLen != sendArray.size())
     {

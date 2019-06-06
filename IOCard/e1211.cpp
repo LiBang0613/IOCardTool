@@ -206,5 +206,6 @@ void E1211::slt_readyRead()
     }
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:1211",m_sendArray,rcvArray);
+    logInfo(m_strIp," type:1211"+(QString)m_sendArray.toHex()+(QString)rcvArray.toHex());
 
 }

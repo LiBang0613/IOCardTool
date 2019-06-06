@@ -63,7 +63,7 @@ private slots:
 
     void on_pb_deleteInfo_clicked();
 
-    void slt_recvConnectFailed();
+    void slt_recvConnectFailed(QString ip);
 
 private:
     bool judgeSettingInfo();

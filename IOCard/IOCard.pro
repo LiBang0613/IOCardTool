@@ -25,12 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += iocard.cpp \
     e1211.cpp \
-    e1240.cpp
+    e1240.cpp \
+    logexport.cpp
 
 HEADERS += iocard.h\
         iocard_global.h \
     e1211.h \
-    e1240.h
+    e1240.h \
+    logexport.h
 
 unix {
     target.path = /usr/lib

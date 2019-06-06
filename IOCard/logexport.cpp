@@ -46,7 +46,7 @@ void LogExport::slt_receiveLog(const QByteArray &info, const int &type)
     updateCurrentFileName((LogType)type);
 
     QFile file(m_strCurrentFileName);
-    qDebug()<<m_strCurrentFileName<<m_iFileMaxSize<<file.size()<<"---------";
+//    qDebug()<<m_strCurrentFileName<<m_iFileMaxSize<<file.size()<<"---------";
     if(file.open(QFile::WriteOnly | QFile::Append | QFile::Text))
     {
         file.write(info);
@@ -63,7 +63,7 @@ void LogExport::slt_receiveLog(const QByteArray & info, const QString &name)
     updateCurrentFileName(name);
 
     QFile file(m_strCurrentFileName);
-    qDebug()<<m_strCurrentFileName<<m_iFileMaxSize<<file.size()<<"---------";
+//    qDebug()<<m_strCurrentFileName<<m_iFileMaxSize<<file.size()<<"---------";
     if(file.open(QFile::WriteOnly | QFile::Append | QFile::Text))
     {
         file.write(info);

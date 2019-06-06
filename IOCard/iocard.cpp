@@ -15,7 +15,6 @@ IOCard::IOCard()
     m_bExitThread = false;
 
     connect(m_pThread,SIGNAL(finished()),m_pThread,SLOT(deleteLater()));
-    connect(&m_cycleTimer,SIGNAL(timeout()),this,SLOT(slt_ProThread()),Qt::QueuedConnection);
     connect(this,SIGNAL(sig_newSocket()),this,SLOT(slt_newSocket()),Qt::QueuedConnection);
     connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread()),Qt::QueuedConnection);
 
@@ -59,7 +58,6 @@ void IOCard::setBitCount(int nCount)
 
 void IOCard::startThread()
 {
-//    m_cycleTimer.start(m_nTimeInterval);
     m_bExitThread = false;
     emit sig_operate();
 }
@@ -68,7 +66,6 @@ void IOCard::stopThread()
 {
     m_bExitThread = true;
     emit sig_stopThread();
-    m_cycleTimer.stop();
     if(m_pThread->isRunning())
     {
         m_pThread->quit();
@@ -112,8 +109,9 @@ void IOCard::slt_newSocket()
     m_qTcpSocket->connectToHost(m_strIp,502);
     if(!m_qTcpSocket->waitForConnected(5000))
     {
+        logInfo(m_strIp,"ip地址连接失败");
         stopThread();
-        emit sig_connectFailed();
+        emit sig_connectFailed(m_strIp);
         return;
     }
     qDebug()<<m_qTcpSocket->state();

@@ -1,7 +1,6 @@
 ﻿#ifndef LOGEXPORT_H
 #define LOGEXPORT_H
 #include <QObject>
-#include <QTextEdit>
 #include <QThread>
 #include <QFile>
 #include <QTime>
@@ -10,6 +9,8 @@
 #include <QMetaType>
 #include <QTimer>
 #include <QSet>
+#include <QMap>
+#include "iocard_global.h"
 
 enum LogLevel
 {
@@ -25,7 +26,7 @@ enum LogType
     Chart = 1
 };
 
-class LogExport:public QObject
+class IOCARDSHARED_EXPORT LogExport:public QObject
 {
     Q_OBJECT
 public:
@@ -62,7 +63,7 @@ private:
 };
 
 
-class ManageLog:public QObject
+class IOCARDSHARED_EXPORT ManageLog:public QObject
 {
     Q_OBJECT
 public:

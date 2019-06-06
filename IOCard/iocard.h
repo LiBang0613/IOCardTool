@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include <QThread>
 #include <QTimer>
+#include "logexport.h"
 
 enum WriteState
 {
@@ -75,7 +76,7 @@ signals:
 
     void sig_operate();
 
-    void sig_connectFailed();
+    void sig_connectFailed(QString);
 protected:
     QThread *m_pThread;
     QTcpSocket *m_qTcpSocket;
@@ -84,7 +85,6 @@ protected:
     int m_nSendTimes;
     int m_nFailedTimes;
     int m_nTimeInterval;
-    QTimer m_cycleTimer;
 public:
     QByteArray m_sendArray;
 

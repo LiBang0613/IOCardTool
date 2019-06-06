@@ -84,7 +84,7 @@ void DaqSet::on_pb_start_clicked()
         }
         connect(card,SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)),this,SLOT(slt_recvCardInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
         connect(card,SIGNAL(sig_statisticsCounts(QString,int,int)),this,SLOT(slt_receCardTimes(QString,int,int)),Qt::QueuedConnection);
-        connect(card,SIGNAL(sig_connectFailed()),this,SLOT(slt_recvConnectFailed()),Qt::QueuedConnection);
+        connect(card,SIGNAL(sig_connectFailed(QString)),this,SLOT(slt_recvConnectFailed(QString)),Qt::QueuedConnection);
         card->setBitCount(count);
         card->setTimeInterval(interval);
         card->Open(ip);
@@ -270,7 +270,11 @@ void DaqSet::on_pb_deleteInfo_clicked()
     }
 }
 
-void DaqSet::slt_recvConnectFailed()
+void DaqSet::slt_recvConnectFailed(QString ip)
 {
-    QMessageBox::information(this,"提示","连接失败，请检查连接。","确定");
+    if(m_mapCardRunTime.contains(ip))
+    {
+        m_mapCardRunTime[ip].bJudge = false;
+    }
+    QMessageBox::information(this,"提示","ip:"+ip+"连接失败，请检查连接。","确定");
 }

@@ -29,13 +29,11 @@ INCLUDEPATH += ../IOCard/ \
 SOURCES += main.cpp\
         mainwindow.cpp \
     multipleset.cpp \
-    daqset.cpp \
-    logexport.cpp
+    daqset.cpp
 
 HEADERS  += mainwindow.h \
     multipleset.h \
-    daqset.h \
-    logexport.h
+    daqset.h
 
 FORMS    += mainwindow.ui \
     multipleset.ui \

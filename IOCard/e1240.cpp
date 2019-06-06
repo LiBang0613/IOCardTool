@@ -93,4 +93,5 @@ void E1240::slt_readyRead()
 //    qDebug()<<"1240"<<QThread::currentThreadId()<<recvArray<<recvArray.size();
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:1240",m_sendArray,recvArray);
+     logInfo(m_strIp," type:1240"+(QString)m_sendArray.toHex()+(QString)recvArray.toHex());
 }

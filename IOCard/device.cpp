@@ -77,6 +77,35 @@ void Device::setDeviceCount(int nDO, int nAI)
     m_nCountAI = nAI;
 }
 
+void Device::start()
+{
+    if(m_vctE1211.size() <= 0 && m_vctE1240.size() <= 0)
+        return ;
+
+    QVector<QString> vctIP;
+
+    QString strNewIP;
+    strNewIP = m_strDeviceIp;
+    vctIP.push_back(m_strDeviceIp);
+    for(int i = 1; i < m_nCountAI + m_nCountDO; i++)
+    {
+        strNewIP = GetOffsetIP(1, strNewIP);
+        vctIP.push_back(strNewIP);
+    }
+
+    for(int i = 0; i < m_vctE1240.size(); i++)
+    {
+        m_vctE1240[i]->Open(vctIP[i]);
+        m_vctE1240[i]->startThread();
+    }
+
+    for(int i = 0; i < m_vctE1211.size(); i++)
+    {
+        m_vctE1211[i]->Open(vctIP[i+m_nCountAI]);
+        m_vctE1211[i]->startThread();
+    }
+}
+
 void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
 {
     int nAITotalCount = 0;

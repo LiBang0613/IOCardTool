@@ -18,6 +18,7 @@ public:
     // 设置设备中IO模块的数量
     virtual void setDeviceCount(int nDO, int nAI); //
 
+    virtual void start();
 protected slots:
     virtual void slt_IOCount(QString strIP, int nTotalCount, int nFailedCount);
     virtual void slt_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv);

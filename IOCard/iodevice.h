@@ -19,6 +19,7 @@ public:
     // 设置设备中IO模块的数量
     virtual void setDeviceCount(int nDO, int nAI) = 0; //
 
+    virtual void start() = 0;
 signals:
     void sig_IOCount(QString strIP, int nTotalCount, int nFailedCount);
     void sig_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv);

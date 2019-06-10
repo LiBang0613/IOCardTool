@@ -14,7 +14,7 @@ MultipleSet::MultipleSet(QWidget *parent) :
     ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
     ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
     connect(&m_clearTextTimer,SIGNAL(timeout()),this,SLOT(slt_clearTextEdit()));
-    m_clearTextTimer.start(1000*60*1);
+    m_clearTextTimer.start(1000);
 }
 
 MultipleSet::~MultipleSet()
@@ -109,13 +109,14 @@ void MultipleSet::on_pb_stop_clicked()
 void MultipleSet::slt_clearTextEdit()
 {
     qDebug()<<ui->te_showMsg->toPlainText().toLatin1().size();
-    ui->te_showMsg->clear();
+    if(ui->te_showMsg->toPlainText().toLatin1().size() > 10000*5)
+        ui->te_showMsg->clear();
 }
 
 void MultipleSet::slt_recvDeviceInfo(const QString &ip, const QByteArray &before, const QByteArray &after)
 {
-    QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
-    ui->te_showMsg->append((text));
+        QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
+        ui->te_showMsg->append((text));
 }
 
 void MultipleSet::slt_receDeviceTimes(const QString &Ip,const int& total,const int &failed)

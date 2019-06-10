@@ -116,7 +116,8 @@ void DaqSet::on_pb_stop_clicked()
 
 void DaqSet::slt_clearTxetEdit()
 {
-    ui->te_showMsg->clear();
+    if(ui->te_showMsg->toPlainText().toLatin1().size() > 10000*5)
+        ui->te_showMsg->clear();
 }
 
 void DaqSet::slt_recvCardInfo(QString ip, QByteArray before, QByteArray after)
@@ -240,7 +241,7 @@ void DaqSet::initPage()
     group2->addButton(ui->rb_net);
 
     connect(&m_clearTextTimer,SIGNAL(timeout()),this,SLOT(slt_clearTxetEdit()));
-    m_clearTextTimer.start(1000*60*2);
+    m_clearTextTimer.start(1000);
 
     ui->le_ip1->setValidator(new QIntValidator(0,255,ui->le_ip1));
     ui->le_ip2->setValidator(new QIntValidator(0,255,ui->le_ip2));

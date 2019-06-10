@@ -11,7 +11,7 @@ public:
 
 protected:
     bool Query_Read(QByteArray &sendBuf,int &nLen);
-    bool Response_Read(QByteArray recvBuf, int nLen);
+    bool Response_Read(QByteArray &recvBuf, int nLen);
 
     void Process();
 

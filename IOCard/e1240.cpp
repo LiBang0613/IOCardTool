@@ -31,7 +31,7 @@ bool E1240::Query_Read(QByteArray &sendBuf, int &nLen)
     return true;
 }
 
-bool E1240::Response_Read(QByteArray recvBuf, int nLen)
+bool E1240::Response_Read(QByteArray &recvBuf, int nLen)
 {
     // 1. 接收长度校验
     if ( nLen != 0x05 + 0x03 + 0x01 + m_nBitCount * 2)
@@ -79,6 +79,7 @@ void E1240::Process()
         qDebug()<<"send error";
         return;
     }
+
     if(m_qTcpSocket->waitForReadyRead() == false)
     {
         return ;

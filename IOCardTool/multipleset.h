@@ -35,14 +35,15 @@ private slots:
     void slt_clearTextEdit();
 
     //接收设备对象的发送和接收到的数据，显示在文本区域中。
-    void slt_recvDeviceInfo(QString ip,QByteArray before,QByteArray after);
+    void slt_recvDeviceInfo(const QString &ip,const QByteArray &before,const QByteArray &after);
 
     //接收设备对象的发送命令的总次数和失败次数的槽函数
-    void slt_receDeviceTimes(QString Ip,int total,int failed);
+    void slt_receDeviceTimes(const QString &Ip, const int &total, const int &failed);
 
     void slt_recvConnectFailed(QString ip);
 
     void on_pb_deleteSet_clicked();
+
 
 private:
     bool judgeSettingInfo();
@@ -52,6 +53,7 @@ private:
 
     QMap<QString,RunTime> m_mapDeviceRunTime;
     QMap<QString,IODevice*> m_mapDeviceObject;
+    QTimer m_clearTextTimer;
 
 };
 

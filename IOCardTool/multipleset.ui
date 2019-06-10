@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>387</width>
+    <width>471</width>
     <height>284</height>
    </rect>
   </property>
@@ -66,11 +66,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="te_showMsg">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <widget class="QTextBrowser" name="te_showMsg"/>
      </item>
     </layout>
    </item>

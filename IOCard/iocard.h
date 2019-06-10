@@ -51,6 +51,9 @@ public:
     void stopThread();
 
     void setTimeInterval(int second);
+public:
+    int m_nSendTimes;
+    int m_nFailedTimes;
 protected:
     //虚函数，子类实现
     virtual void Process() = 0;
@@ -82,8 +85,6 @@ protected:
     QTcpSocket *m_qTcpSocket;
     QString m_strIp;
     int m_nBitCount;
-    int m_nSendTimes;
-    int m_nFailedTimes;
     int m_nTimeInterval;
 public:
     QByteArray m_sendArray;

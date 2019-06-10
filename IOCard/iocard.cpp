@@ -119,6 +119,7 @@ void IOCard::slt_newSocket()
     connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
 
     m_qTcpSocket->connectToHost(m_strIp,502);
+    m_qTcpSocket->setReadBufferSize(1024);
     if(!m_qTcpSocket->waitForConnected(5000))
     {
         logInfo(m_strIp,"ip地址连接失败");

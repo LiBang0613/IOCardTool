@@ -79,8 +79,23 @@ void Device::setDeviceCount(int nDO, int nAI)
 
 void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
 {
-    m_nTotalCount += nTotalCount;
-    m_nFailedCount += nFailedCount;
+    int nAITotalCount = 0;
+    int nAIFailedCount = 0;
+    int nDOTotalCount = 0;
+    int nDOFailedCOunt = 0;
+    for(int i = 0; i < m_nCountAI; i++)
+    {
+        nAITotalCount = m_vctE1240[i]->m_nSendTimes;
+        nAIFailedCount = m_vctE1240[i]->m_nFailedTimes;
+    }
+
+    for(int i = 0; i < m_nCountDO; i++)
+    {
+       nDOTotalCount =  m_vctE1211[i]->m_nSendTimes;
+       nDOFailedCOunt = m_vctE1211[i]->m_nFailedTimes;
+    }
+    m_nTotalCount = nAITotalCount + nDOTotalCount;
+    m_nFailedCount = nAIFailedCount + nDOFailedCOunt;
     emit sig_IOCount(m_strDeviceIp, m_nTotalCount, m_nFailedCount);
 }
 

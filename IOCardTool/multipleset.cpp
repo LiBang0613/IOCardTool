@@ -13,6 +13,8 @@ MultipleSet::MultipleSet(QWidget *parent) :
     ui->le_ip2->setValidator(new QIntValidator(0,255,ui->le_ip2));
     ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
     ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
+    connect(&m_clearTextTimer,SIGNAL(timeout()),this,SLOT(slt_clearTextEdit()));
+    m_clearTextTimer.start(1000*60*1);
 }
 
 MultipleSet::~MultipleSet()
@@ -32,26 +34,29 @@ void MultipleSet::on_pb_saveInfo_clicked()
     switch (ui->comB_deviceType->currentIndex())
     {
     case dtDevice1:
-            num1211 = 1;
-            num1240 = 1;
+        num1211 = 1;
+        num1240 = 1;
         break;
     case dtDevice2:
-            num1211 = 3;
-            num1240 = 0;
+        num1211 = 3;
+        num1240 = 0;
         break;
     case dtDevice3:
-            num1211 = 0;
-            num1240 = 3;
+        num1211 = 0;
+        num1240 = 3;
         break;
     case dtDevice4:
-            num1211 = 1;
-            num1240 = 2;
+        num1211 = 1;
+        num1240 = 2;
         break;
     }
     ui->table_Info->setItem(row,0,new QTableWidgetItem(ui->comB_deviceType->currentText().trimmed()));
     ui->table_Info->setItem(row,1,new QTableWidgetItem(getIpAddr()));
     ui->table_Info->setItem(row,2,new QTableWidgetItem(QString::number(num1211)));
     ui->table_Info->setItem(row,3,new QTableWidgetItem(QString::number(num1240)));
+    ui->table_Info->setItem(row,4,new QTableWidgetItem());
+    ui->table_Info->setItem(row,5,new QTableWidgetItem());
+    ui->table_Info->setItem(row,6,new QTableWidgetItem());
 }
 
 void MultipleSet::on_pb_start_clicked()
@@ -103,18 +108,19 @@ void MultipleSet::on_pb_stop_clicked()
 
 void MultipleSet::slt_clearTextEdit()
 {
+    qDebug()<<ui->te_showMsg->toPlainText().toLatin1().size();
     ui->te_showMsg->clear();
 }
 
-void MultipleSet::slt_recvDeviceInfo(QString ip, QByteArray before, QByteArray after)
+void MultipleSet::slt_recvDeviceInfo(const QString &ip, const QByteArray &before, const QByteArray &after)
 {
     QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
     ui->te_showMsg->append((text));
 }
 
-void MultipleSet::slt_receDeviceTimes(QString Ip, int total, int failed)
+void MultipleSet::slt_receDeviceTimes(const QString &Ip,const int& total,const int &failed)
 {
-    qDebug()<<"total"<<total<<"failed"<<failed<<Ip;
+    //    qDebug()<<"total"<<total<<"failed"<<failed<<Ip;
     for(int i=0;i<ui->table_Info->rowCount();++i)
     {
         if(Ip == ui->table_Info->item(i,1)->text())
@@ -124,9 +130,9 @@ void MultipleSet::slt_receDeviceTimes(QString Ip, int total, int failed)
             {
                 QDateTime beginTime = QDateTime::fromString(m_mapDeviceRunTime.value(Ip).strBeginTime,"yyyyMMddhhmmss");
                 int second = beginTime.secsTo(QDateTime::currentDateTime());
-                ui->table_Info->setItem(i,4,new QTableWidgetItem(QString::number(second)));
-                ui->table_Info->setItem(i,5,new QTableWidgetItem(QString::number(total)));
-                ui->table_Info->setItem(i,6,new QTableWidgetItem(QString::number(failed)));
+                ui->table_Info->item(i,4)->setText(QString::number(second));
+                ui->table_Info->item(i,5)->setText(QString::number(total));
+                ui->table_Info->item(i,6)->setText(QString::number(failed));
             }
         }
     }
@@ -134,6 +140,8 @@ void MultipleSet::slt_receDeviceTimes(QString Ip, int total, int failed)
 
 void MultipleSet::slt_recvConnectFailed(QString ip)
 {
+    if(m_mapDeviceRunTime.contains(ip))
+        m_mapDeviceRunTime[ip].bJudge = false;
     QMessageBox::information(this,"提示","ip:"+ip+"设备连接失败。","确定");
 }
 

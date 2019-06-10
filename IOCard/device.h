@@ -1,4 +1,4 @@
-#ifndef DEVICE_H
+﻿#ifndef DEVICE_H
 #define DEVICE_H
 
 #include "iodevice.h"
@@ -35,6 +35,7 @@ private:
 
     int m_nTotalCount;
     int m_nFailedCount;
+    QString m_strDeviceIp;
 };
 
 #endif // DEVICE_H

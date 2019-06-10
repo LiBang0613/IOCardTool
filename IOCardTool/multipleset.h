@@ -40,7 +40,7 @@ private slots:
     //接收设备对象的发送命令的总次数和失败次数的槽函数
     void slt_receDeviceTimes(QString Ip,int total,int failed);
 
-    void slt_recvConnectFailed();
+    void slt_recvConnectFailed(QString ip);
 
     void on_pb_deleteSet_clicked();
 
@@ -50,7 +50,7 @@ private:
 private:
     Ui::MultipleSet *ui;
 
-    QMap<QString,RunTime> m_mapCardRunTime;
+    QMap<QString,RunTime> m_mapDeviceRunTime;
     QMap<QString,IODevice*> m_mapDeviceObject;
 
 };

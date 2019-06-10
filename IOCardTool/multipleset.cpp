@@ -61,17 +61,17 @@ void MultipleSet::on_pb_start_clicked()
         QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
         int nDoCount = ui->table_Info->item(ui->table_Info->currentRow(),2)->text().toInt();
         int nAiCount = ui->table_Info->item(ui->table_Info->currentRow(),3)->text().toInt();
-        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime.value(ip).bJudge == true)
+        if(m_mapDeviceRunTime.contains(ip) && m_mapDeviceRunTime.value(ip).bJudge == true)
         {
             QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
             return;
         }
         RunTime time;
         time.bJudge = true;
-        time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMDDhhmmss");
-        m_mapCardRunTime.insert(ip,time);
+        time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
+        m_mapDeviceRunTime.insert(ip,time);
         IODevice* device = new Device;
-        connect(device,SIGNAL(sig_connectfailed(QString)),this,SLOT(slt_recvConnectFailed()),Qt::QueuedConnection);
+        connect(device,SIGNAL(sig_connectfailed(QString)),this,SLOT(slt_recvConnectFailed(QString)),Qt::QueuedConnection);
         connect(device,SIGNAL(sig_IOCount(QString,int,int)),this,SLOT(slt_receDeviceTimes(QString,int,int)),Qt::QueuedConnection);
         connect(device,SIGNAL(sig_IObuf(QString,QByteArray,QByteArray)),this,SLOT(slt_recvDeviceInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
         device->setDeviceCount(nDoCount,nAiCount);
@@ -89,9 +89,9 @@ void MultipleSet::on_pb_stop_clicked()
     if(ui->table_Info->currentRow() != -1)
     {
         QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
-        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
+        if(m_mapDeviceRunTime.contains(ip) && m_mapDeviceRunTime[ip].bJudge == true)
         {
-            m_mapCardRunTime[ip].bJudge = false;
+            m_mapDeviceRunTime[ip].bJudge = false;
             m_mapDeviceObject.value(ip)->Close();
         }
     }
@@ -114,14 +114,15 @@ void MultipleSet::slt_recvDeviceInfo(QString ip, QByteArray before, QByteArray a
 
 void MultipleSet::slt_receDeviceTimes(QString Ip, int total, int failed)
 {
+    qDebug()<<"total"<<total<<"failed"<<failed<<Ip;
     for(int i=0;i<ui->table_Info->rowCount();++i)
     {
-        if(Ip == ui->table_Info->item(i,2)->text())
+        if(Ip == ui->table_Info->item(i,1)->text())
         {
-            if(m_mapCardRunTime.contains(Ip) &&
-                    m_mapCardRunTime.value(Ip).bJudge)
+            if(m_mapDeviceRunTime.contains(Ip) &&
+                    m_mapDeviceRunTime.value(Ip).bJudge)
             {
-                QDateTime beginTime = QDateTime::fromString(m_mapCardRunTime.value(Ip).strBeginTime,"yyyyMMddhhmmss");
+                QDateTime beginTime = QDateTime::fromString(m_mapDeviceRunTime.value(Ip).strBeginTime,"yyyyMMddhhmmss");
                 int second = beginTime.secsTo(QDateTime::currentDateTime());
                 ui->table_Info->setItem(i,4,new QTableWidgetItem(QString::number(second)));
                 ui->table_Info->setItem(i,5,new QTableWidgetItem(QString::number(total)));
@@ -131,9 +132,9 @@ void MultipleSet::slt_receDeviceTimes(QString Ip, int total, int failed)
     }
 }
 
-void MultipleSet::slt_recvConnectFailed()
+void MultipleSet::slt_recvConnectFailed(QString ip)
 {
-
+    QMessageBox::information(this,"提示","ip:"+ip+"设备连接失败。","确定");
 }
 
 bool MultipleSet::judgeSettingInfo()
@@ -172,9 +173,9 @@ void MultipleSet::on_pb_deleteSet_clicked()
     if(ui->table_Info->currentRow() != -1)
     {
         QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
-        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
+        if(m_mapDeviceRunTime.contains(ip) && m_mapDeviceRunTime[ip].bJudge == true)
         {
-            m_mapCardRunTime.remove(ip);
+            m_mapDeviceRunTime.remove(ip);
             IODevice* device = m_mapDeviceObject.take(ip);
             device->Close();
             device->deleteLater();

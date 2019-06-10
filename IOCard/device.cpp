@@ -19,6 +19,7 @@ bool Device::Open(QString strIP)
     if(m_nCountAI <=0 && m_nCountDO <= 0)
         return false;
 
+     m_strDeviceIp = strIP;
     QVector<QString> vctIP;
 
     QString strNewIP;
@@ -80,7 +81,7 @@ void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
 {
     m_nTotalCount += nTotalCount;
     m_nFailedCount += nFailedCount;
-    emit sig_IOCount(strIP, m_nTotalCount, m_nFailedCount);
+    emit sig_IOCount(m_strDeviceIp, m_nTotalCount, m_nFailedCount);
 }
 
 void Device::slt_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv)

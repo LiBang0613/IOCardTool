@@ -32,7 +32,7 @@ void MultipleSet::on_pb_saveInfo_clicked()
     switch (ui->comB_deviceType->currentIndex())
     {
     case dtDevice1:
-            num1211 = 2;
+            num1211 = 1;
             num1240 = 1;
         break;
     case dtDevice2:
@@ -70,13 +70,13 @@ void MultipleSet::on_pb_start_clicked()
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMDDhhmmss");
         m_mapCardRunTime.insert(ip,time);
-        IODevice* pIoDevice = new Device;
-        connect(pIoDevice,SIGNAL(sig_IOCount(QString,int,int)),this,SLOT(slt_receDeviceTimes(QString,int,int)),Qt::QueuedConnection);
-        connect(pIoDevice,SIGNAL(sig_IObuf(QString,QByteArray,QByteArray)),this,SLOT(slt_recvDeviceInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
-        connect(pIoDevice,SIGNAL(sig_connectfailed(QString)),this,SLOT(slt_recvConnectFailed()),Qt::QueuedConnection);
-        pIoDevice->setDeviceCount(nDoCount,nAiCount);
-        pIoDevice->Open(ip);
-        m_mapDeviceObject.insert(ip,pIoDevice);
+        IODevice* device = new Device;
+        connect(device,SIGNAL(sig_connectfailed(QString)),this,SLOT(slt_recvConnectFailed()),Qt::QueuedConnection);
+        connect(device,SIGNAL(sig_IOCount(QString,int,int)),this,SLOT(slt_receDeviceTimes(QString,int,int)),Qt::QueuedConnection);
+        connect(device,SIGNAL(sig_IObuf(QString,QByteArray,QByteArray)),this,SLOT(slt_recvDeviceInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
+        device->setDeviceCount(nDoCount,nAiCount);
+        device->Open(ip);
+        m_mapDeviceObject.insert(ip,device);
     }
     else
     {
@@ -92,6 +92,7 @@ void MultipleSet::on_pb_stop_clicked()
         if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
         {
             m_mapCardRunTime[ip].bJudge = false;
+            m_mapDeviceObject.value(ip)->Close();
         }
     }
     else
@@ -115,7 +116,7 @@ void MultipleSet::slt_receDeviceTimes(QString Ip, int total, int failed)
 {
     for(int i=0;i<ui->table_Info->rowCount();++i)
     {
-        if(Ip == ui->table_Info->item(i,1)->text())
+        if(Ip == ui->table_Info->item(i,2)->text())
         {
             if(m_mapCardRunTime.contains(Ip) &&
                     m_mapCardRunTime.value(Ip).bJudge)
@@ -165,3 +166,24 @@ QString MultipleSet::getIpAddr()
     return ip;
 }
 
+
+void MultipleSet::on_pb_deleteSet_clicked()
+{
+    if(ui->table_Info->currentRow() != -1)
+    {
+        QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
+        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
+        {
+            m_mapCardRunTime.remove(ip);
+            IODevice* device = m_mapDeviceObject.take(ip);
+            device->Close();
+            device->deleteLater();
+            device = NULL;
+        }
+        ui->table_Info->removeRow(ui->table_Info->currentRow());
+    }
+    else
+    {
+        QMessageBox::information(this,"提示","点击停止前请先选中表格中某行数据。","确定");
+    }
+}

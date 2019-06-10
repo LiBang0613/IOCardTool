@@ -46,7 +46,7 @@ bool Device::Open(QString strIP)
     for(int i = 0; i < m_nCountDO; i++)
     {
         E1211* card = new E1211;
-        card->setBitCount(16);
+        card->setBitCount(2);
         card->setTimeInterval(5);
         connect(card, SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)), this, SLOT(slt_IObuf(QString,QByteArray,QByteArray)), Qt::QueuedConnection);
         connect(card, SIGNAL(sig_statisticsCounts(QString,int,int)), this, SLOT(slt_IOCount(QString,int,int)), Qt::QueuedConnection);

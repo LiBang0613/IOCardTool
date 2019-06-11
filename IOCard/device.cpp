@@ -7,6 +7,8 @@ Device::Device()
 
     m_nTotalCount = 0;
     m_nFailedCount = 0;
+
+    m_bSendConnectedFailed = false;
 }
 
 Device::~Device()
@@ -38,7 +40,8 @@ bool Device::Open(QString strIP)
         card->setTimeInterval(10);
         connect(card, SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)), this, SLOT(slt_IObuf(QString,QByteArray,QByteArray)), Qt::QueuedConnection);
         connect(card, SIGNAL(sig_statisticsCounts(QString,int,int)), this, SLOT(slt_IOCount(QString,int,int)), Qt::QueuedConnection);
-        connect(card, SIGNAL(sig_connectFailed(QString)), this, SIGNAL(sig_connectfailed(QString)), Qt::QueuedConnection);
+//        connect(card, SIGNAL(sig_connectFailed(QString)), this, SIGNAL(sig_connectfailed(QString)), Qt::QueuedConnection);
+        connect(card, SIGNAL(sig_connectFailed(QString)), this, SLOT(), Qt::QueuedConnection);
 
         card->Open(vctIP[i]);
         card->startThread();
@@ -95,6 +98,30 @@ void Device::setDeviceCount(int nDO, int nAI)
     m_nCountAI = nAI;
 }
 
+void Device::reConnect(QString strIP, uint nPort)
+{
+    QVector<QString> vctIP;
+
+    QString strNewIP;
+    strNewIP = m_strDeviceIp;
+    vctIP.push_back(m_strDeviceIp);
+    for(int i = 1; i < m_nCountAI + m_nCountDO; i++)
+    {
+        strNewIP = GetOffsetIP(1, strNewIP);
+        vctIP.push_back(strNewIP);
+    }
+
+    for(int i = 0; i < m_nCountAI; i++)
+    {
+        m_vctE1240[i]->reConnect(vctIP[i]);
+    }
+
+    for(int i = 0; i < m_nCountDO; i++)
+    {
+        m_vctE1211[i]->reConnect(vctIP[i+m_nCountAI]);
+    }
+}
+
 void Device::start()
 {
     if(m_vctE1211.size() <= 0 && m_vctE1240.size() <= 0)
@@ -147,6 +174,14 @@ void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
 void Device::slt_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv)
 {
     emit sig_IObuf(strIP, bufSend, bufRcv);
+}
+
+void Device::slt_connectedfailed(QString strIP)
+{
+    if(!m_bSendConnectedFailed)
+        emit sig_connectfailed(strIP);
+
+    m_bSendConnectedFailed = true;
 }
 
 QString Device::GetOffsetIP(int nOffset, QString strIP)

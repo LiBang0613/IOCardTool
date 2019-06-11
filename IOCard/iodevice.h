@@ -20,6 +20,7 @@ public:
     // 设置设备中IO模块的数量
     virtual void setDeviceCount(int nDO, int nAI) = 0; //
 
+    virtual void reConnect(QString strIP, uint nPort = 520) = 0;
     virtual void start() = 0;
 signals:
     void sig_IOCount(QString strIP, int nTotalCount, int nFailedCount);
@@ -29,6 +30,8 @@ signals:
 protected slots:
     virtual void slt_IOCount(QString strIP, int nTotalCount, int nFailedCount) = 0;
     virtual void slt_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv) = 0;
+
+    virtual void slt_connectedfailed(QString strIP) = 0;
 };
 
 #endif // IODEVICE_H

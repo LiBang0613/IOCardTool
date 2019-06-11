@@ -21,6 +21,7 @@ IOCard::IOCard()
     connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread()),Qt::QueuedConnection);
 
     connect(this, SIGNAL(sig_operate()), this, SLOT(slt_ProThread()), Qt::QueuedConnection);
+    connect(this, SIGNAL(sig_reConnect(QString,uint)), this, SLOT(slt_reConnect(QString,uint)), Qt::QueuedConnection);
 }
 
 IOCard::~IOCard()

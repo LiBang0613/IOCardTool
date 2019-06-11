@@ -24,6 +24,7 @@ bool Device::Open(QString strIP)
      m_strDeviceIp = strIP;
     QVector<QString> vctIP;
 
+    // ------------>> 获取偏移地址 ---------------------
     QString strNewIP;
     strNewIP = strIP;
     vctIP.push_back(strIP);
@@ -32,7 +33,9 @@ bool Device::Open(QString strIP)
         strNewIP = GetOffsetIP(1, strNewIP);
         vctIP.push_back(strNewIP);
     }
+    // ------------<< 获取偏移地址 ---------------------
 
+    // ------------>> 连接设备 ------------------------
     for(int i = 0; i < m_nCountAI; i++)
     {
         E1240* card = new E1240;
@@ -58,12 +61,14 @@ bool Device::Open(QString strIP)
         card->startThread();
         m_vctE1211.push_back(card);
     }
+    // ------------<< 连接设备 ------------------------
 
     return true;
 }
 
 bool Device::Close()
 {
+    // 退出设备通讯线程
     for(int i = 0; i < m_nCountAI; i++)
     {
         m_vctE1240[i]->closeThread();
@@ -78,6 +83,7 @@ bool Device::Close()
 
 bool Device::Stop()
 {
+    // 退出设备通讯线程函数
     for(int i = 0; i < m_nCountAI; i++)
     {
         m_vctE1240[i]->stopThread();
@@ -99,6 +105,7 @@ void Device::setDeviceCount(int nDO, int nAI)
 
 void Device::reConnect(QString strIP, uint nPort)
 {
+    // 获取偏移地址，重新连接设备
     QVector<QString> vctIP;
 
     QString strNewIP;
@@ -122,6 +129,7 @@ void Device::reConnect(QString strIP, uint nPort)
     m_bSendConnectedFailed = false;
 }
 
+// 重启设备线程函数
 void Device::start()
 {
     if(m_vctE1211.size() <= 0 && m_vctE1240.size() <= 0)
@@ -151,6 +159,7 @@ void Device::start()
 
 void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
 {
+    // ------------>> 计算设备中IO模块总的发送次数和错误次数--------------------
     int nAITotalCount = 0;
     int nAIFailedCount = 0;
     int nDOTotalCount = 0;
@@ -168,6 +177,9 @@ void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
     }
     m_nTotalCount = nAITotalCount + nDOTotalCount;
     m_nFailedCount = nAIFailedCount + nDOFailedCOunt;
+    // ------------<< 计算设备中IO模块总的发送次数和错误次数--------------------
+
+    // 向外部发送次数信息
     emit sig_IOCount(m_strDeviceIp, m_nTotalCount, m_nFailedCount);
 }
 

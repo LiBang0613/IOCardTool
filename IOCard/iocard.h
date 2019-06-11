@@ -17,8 +17,8 @@ enum WriteState
 struct CtrlDO
 {
     unsigned short	wID;		// 组ID标识
-    int		nRegAddr;
-    int		nRegCount;
+    int		nRegAddr;           // 线圈起始位置
+    int		nRegCount;          // 可控的线圈数量
 
     unsigned short	wCmd;		// 命令值
     WriteState	wState;		// 写操作-状态
@@ -78,27 +78,32 @@ signals:
     //发送内容信号
     void sig_sendRecv(QString,QByteArray,QByteArray);
 
+    // socket准备信号，发送后准备设备连接的socket
     void sig_newSocket();
 
+    // socket断开信号，断开socket连接
     void sig_stopThread();
 
+    // 线程函数开始执行信号
     void sig_operate();
 
+    // 设备连接失败信号
     void sig_connectFailed(QString);
 
+    // 重新连接设备信号
     void sig_reConnect(QString strIP, uint nPort = 502);
 protected:
     QThread *m_pThread;
     QTcpSocket *m_qTcpSocket;
-    QString m_strIp;
-    int m_nBitCount;
-    int m_nTimeInterval;
+    QString m_strIp;            // 设备IP地址
+    int m_nBitCount;            // 可控的线圈/寄存器数量
+    int m_nTimeInterval;        // 命令发送时间间隔，单位：ms
 public:
-    QByteArray m_sendArray;
+    QByteArray m_sendArray;     // 保存设备发送的命令
 
 private:
-    bool m_bNewSocket;
-    bool m_bExitThread;
+    bool m_bNewSocket;          // socket是否已存在
+    bool m_bExitThread;         // 是否退出线程函数  true - 退出, false - 不退出
 };
 
 #endif // IOCARD_H

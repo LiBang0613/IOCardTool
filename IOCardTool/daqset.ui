@@ -391,6 +391,26 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>rb_Moxa</tabstop>
+  <tabstop>rb_smacq</tabstop>
+  <tabstop>rb_485</tabstop>
+  <tabstop>rb_net</tabstop>
+  <tabstop>comB_cardType</tabstop>
+  <tabstop>le_timeInterval</tabstop>
+  <tabstop>sb_pass</tabstop>
+  <tabstop>le_deviceAddr</tabstop>
+  <tabstop>le_ip1</tabstop>
+  <tabstop>le_ip2</tabstop>
+  <tabstop>le_ip3</tabstop>
+  <tabstop>le_ip4</tabstop>
+  <tabstop>pb_saveInfo</tabstop>
+  <tabstop>table_Msg</tabstop>
+  <tabstop>te_showMsg</tabstop>
+  <tabstop>pb_start</tabstop>
+  <tabstop>pb_stop</tabstop>
+  <tabstop>pb_deleteInfo</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

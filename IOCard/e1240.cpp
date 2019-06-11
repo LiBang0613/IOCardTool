@@ -37,7 +37,7 @@ bool E1240::Response_Read(QByteArray &recvBuf, int nLen)
     if ( nLen != 0x05 + 0x03 + 0x01 + m_nBitCount * 2)
     {
         m_nFailedTimes++;
-        logError(m_strIp,"1240发送响应数据长度不一致。");
+        logError(m_strIp+"_data","1240发送响应数据长度不一致。");
         return false;
     }
     // 2. 功能码+数据长度校验
@@ -47,7 +47,7 @@ bool E1240::Response_Read(QByteArray &recvBuf, int nLen)
          )
     {
         m_nFailedTimes++;
-        logError(m_strIp,"1240发送响应数据长度不一致或者功能码不一致。");
+        logError(m_strIp+"_data","1240发送响应数据长度不一致或者功能码不一致。");
         return false;	// 错误
     }
     //	CSafeLock cLock(&m_cMutex);
@@ -77,6 +77,7 @@ void E1240::Process()
     if(nSendLen != sendArray.size())
     {
         qDebug()<<"send error";
+        logError(m_strIp+"_data","1240发送数据错误");
         return;
     }
 
@@ -97,5 +98,5 @@ void E1240::slt_readyRead()
 //    qDebug()<<"1240"<<QThread::currentThreadId()<<recvArray<<recvArray.size();
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:1240",m_sendArray,recvArray);
-     logInfo(m_strIp," type:1240 send:"+(QString)m_sendArray.toHex()+"recv:"+(QString)recvArray.toHex());
+     logInfo(m_strIp+"_data"," type:1240 send:"+(QString)m_sendArray.toHex()+"recv:"+(QString)recvArray.toHex());
 }

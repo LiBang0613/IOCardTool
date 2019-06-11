@@ -46,7 +46,7 @@ bool E1211::Response_Read(QByteArray recvBuf, int nLen)
     if ( nLen != 0x05 + 0x05 + 0x01)
     {
         m_nFailedTimes++;
-        logError(m_strIp,"1211数据长度接收不正确Response_Read");
+        logError(m_strIp+"_data","1211数据长度接收不正确Response_Read");
         return false; // 接收不正确
     }
 
@@ -57,7 +57,7 @@ bool E1211::Response_Read(QByteArray recvBuf, int nLen)
          )
     { // 接收不正确
         m_nFailedTimes++;
-        logError(m_strIp,"1211功能码接收不正确Response_Read");
+        logError(m_strIp+"_data","1211功能码接收不正确Response_Read");
         return false;
     }
 
@@ -122,7 +122,7 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
     if ( nLen != 0x05 + 0x06 + 0x01)
     {
         m_nFailedTimes++;
-        logError(m_strIp,"1211数据长度接收不正确Response_Write");
+        logError(m_strIp+"_data","1211数据长度接收不正确Response_Write");
         return false; // 接收不正确
     }
 
@@ -136,7 +136,7 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
          )
     { // 接收不正确
         m_nFailedTimes++;
-        logError(m_strIp,"1211功能码接收不正确Response_Write");
+        logError(m_strIp+"_data","1211功能码接收不正确Response_Write");
         return false;
     }
 
@@ -215,6 +215,6 @@ void E1211::slt_readyRead()
     }
     emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:1211",m_sendArray,rcvArray);
-    logInfo(m_strIp,"type:1211 send:"+(QString)m_sendArray.toHex()+" recv:"+(QString)rcvArray.toHex());
+    logInfo(m_strIp+"_data","type:1211 send:"+(QString)m_sendArray.toHex()+" recv:"+(QString)rcvArray.toHex());
 
 }

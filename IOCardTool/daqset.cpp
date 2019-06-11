@@ -270,7 +270,8 @@ void DaqSet::on_pb_deleteInfo_clicked()
             IOCard* card = m_mapIOCardObject.take(ip);
             card->stopThread();
             card->closeThread();
-            card->deleteLater();
+            delete card;
+//            card->deleteLater();
             card = NULL;
         }
         ui->table_Msg->removeRow(ui->table_Msg->currentRow());

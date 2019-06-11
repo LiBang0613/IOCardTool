@@ -10,17 +10,6 @@
 #include "e1240.h"
 #include "e1211.h"
 
-struct DataCardInfo
-{
-    int    nCardType; 			//数采卡类型，MOXAMODE:moxa; SMACQMODE:思迈科华;
-    int  nConnectType;		   //网络连接类型，485TYPE:485类型; NETTYPE:网口类型
-    QString strType;			//数采卡型号
-    int   nTimeInterval;		//时间间隔
-    int   nPass;				//读取的通道数量
-    int   nDeviceAddr;       //设备地址
-    QString strIp;            //数采卡的ip地址
-};
-
 struct RunTime
 {
     bool bJudge;            //开始测试或者停止的标志
@@ -41,12 +30,16 @@ public:
     ~DaqSet();
 
 private slots:
+    //保存输入的数采卡信息并展示在表格中。
     void on_pb_saveInfo_clicked();
 
+    //开始测试选中的数采卡信息
     void on_pb_start_clicked();
 
+    //暂停当前选中运行的数采卡
     void on_pb_stop_clicked();
 
+    //定时清空文本域中的文本，避免内存过大。
     void slt_clearTxetEdit();
 
     //接收数采卡对象的发送和接收到的数据，显示在文本区域中。
@@ -55,19 +48,27 @@ private slots:
     //接收数采卡对象的发送命令的总次数和失败次数的槽函数
     void slt_receCardTimes(QString Ip,int total,int failed);
 
+    //根据moxa单选按钮禁用485连接方式
     void on_rb_Moxa_clicked();
 
+    //根据smacq单选按钮选中解除485连接禁用状态
     void on_rb_smacq_clicked();
 
+    //根据数采卡类型设置读取通道数的范围
     void on_comB_cardType_currentIndexChanged(const QString &arg1);
 
+    //删除数采卡配置信息及数采卡对象指针。
     void on_pb_deleteInfo_clicked();
 
+    //接收数采卡发送连接失败的信号的槽函数，并根据提示是否进行重新连接。
     void slt_recvConnectFailed(QString ip);
 
 private:
+    //判断输入信息是否正确
     bool judgeSettingInfo();
+    //根据四个文本框获取ip地址
     QString getIpAddr();
+    //初始化页面资源
     void initPage();
 
 private:

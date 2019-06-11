@@ -63,8 +63,6 @@ protected:
     virtual void Process() = 0;
 
 protected slots:
-    void slt_tcpConnected();
-    void slt_recvSocketState(QAbstractSocket::SocketState state);
     void slt_tcpDisConnected();
     virtual void slt_readyRead() = 0;
     void slt_ProThread();

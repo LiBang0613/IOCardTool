@@ -13,7 +13,21 @@ Device::Device()
 
 Device::~Device()
 {
+    for(int i = 0; i < m_vctE1240.size(); i++)
+    {
+        E1240* card = m_vctE1240[i];
+        delete card;
+        card = NULL;
+    }
 
+    for(int i = 0; i < m_vctE1211.size(); i++)
+    {
+        E1211* card = m_vctE1211[i];
+        delete card;
+        card = NULL;
+    }
+    m_vctE1211.clear();
+    m_vctE1240.clear();
 }
 
 bool Device::Open(QString strIP)
@@ -78,6 +92,7 @@ bool Device::Close()
     {
         m_vctE1211[i]->closeThread();
     }
+    logInfo(m_strDeviceIp+"_device","关闭设备通讯线程");
     return true;
 }
 
@@ -93,7 +108,7 @@ bool Device::Stop()
     {
         m_vctE1211[i]->stopThread();
     }
-
+    logInfo(m_strDeviceIp+"_device","停止设备通讯线程");
     return true;
 }
 
@@ -155,6 +170,7 @@ void Device::start()
     {
         m_vctE1211[i]->startThread();
     }
+    logInfo(m_strDeviceIp+"_device","启动设备通讯线程");
 }
 
 void Device::slt_IOCount(QString strIP, int nTotalCount, int nFailedCount)
@@ -194,6 +210,7 @@ void Device::slt_connectedfailed(QString strIP)
         emit sig_connectfailed(m_strDeviceIp);
 
     m_bSendConnectedFailed = true;
+    logError(m_strDeviceIp+"_device","设备接收到连接失败信号");
 }
 
 QString Device::GetOffsetIP(int nOffset, QString strIP)

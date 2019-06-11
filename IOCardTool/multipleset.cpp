@@ -117,7 +117,6 @@ void MultipleSet::on_pb_stop_clicked()
 
 void MultipleSet::slt_clearTextEdit()
 {
-//    qDebug()<<ui->te_showMsg->toPlainText().toLatin1().size();
     if(ui->te_showMsg->toPlainText().toLatin1().size() > 10000*5)
         ui->te_showMsg->clear();
 }
@@ -130,7 +129,6 @@ void MultipleSet::slt_recvDeviceInfo(const QString &ip, const QByteArray &before
 
 void MultipleSet::slt_receDeviceTimes(const QString &Ip,const int& total,const int &failed)
 {
-    //    qDebug()<<"total"<<total<<"failed"<<failed<<Ip;
     for(int i=0;i<ui->table_Info->rowCount();++i)
     {
         if(Ip == ui->table_Info->item(i,1)->text())
@@ -213,7 +211,8 @@ void MultipleSet::on_pb_deleteSet_clicked()
             IODevice* device = m_mapDeviceObject.take(ip);
             device->Stop();
             device->Close();
-            device->deleteLater();
+            delete device;
+//            device->deleteLater();
             device = NULL;
         }
         ui->table_Info->removeRow(ui->table_Info->currentRow());

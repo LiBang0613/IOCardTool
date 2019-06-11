@@ -71,11 +71,13 @@ void IOCard::startThread()
 {
     m_bExitThread = false;
     emit sig_operate();
+    logInfo(m_strIp+"_net","开始线程");
 }
 
 void IOCard::stopThread()
 {
     m_bExitThread = true;
+    logInfo(m_strIp+"_net","停止线程");
 }
 
 void IOCard::setTimeInterval(int second)
@@ -92,19 +94,9 @@ void IOCard::closeThread()
         m_pThread->quit();
         m_pThread->wait();
     }
+    logInfo(m_strIp+"_net","关闭线程");
 }
 
-
-void IOCard::slt_tcpConnected()
-{
-    qDebug()<<"connected success";
-
-}
-
-void IOCard::slt_recvSocketState(QAbstractSocket::SocketState state)
-{
-    qDebug()<<"state:"<<state;
-}
 
 void IOCard::slt_ProThread()
 {
@@ -126,16 +118,13 @@ void IOCard::slt_ProThread()
 void IOCard::slt_newSocket()
 {
     m_qTcpSocket = new QTcpSocket;
-    //    connect(m_qTcpSocket,SIGNAL(connected()),this,SLOT(slt_tcpConnected()),Qt::QueuedConnection);
-    //    connect(m_qTcpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(slt_recvSocketState(QAbstractSocket::SocketState)),Qt::QueuedConnection);
-    //    connect(m_qTcpSocket,SIGNAL(readyRead()),this,SLOT(slt_readyRead()),Qt::QueuedConnection);
     connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
 
     m_qTcpSocket->connectToHost(m_strIp,502);
     m_qTcpSocket->setReadBufferSize(1024);
     if(!m_qTcpSocket->waitForConnected(5000))
     {
-        logInfo(m_strIp,"ip地址连接失败");
+        logInfo(m_strIp+"_net","ip地址连接失败");
         stopThread();
         emit sig_connectFailed(m_strIp);
         return;
@@ -150,11 +139,13 @@ void IOCard::slt_stopThread()
     if(m_qTcpSocket->state() == QTcpSocket::ConnectedState)
         m_qTcpSocket->disconnectFromHost();
     m_qTcpSocket->waitForDisconnected();
+    logInfo(m_strIp+"_net","socket断开连接");
 }
 
 void IOCard::slt_tcpDisConnected()
 {
     qDebug()<<"disconnected";
+    logInfo(m_strIp+"_net","socket主动断开连接，disconnect");
 }
 
 void IOCard::slt_reConnect(QString strIP, uint nPort)
@@ -165,6 +156,7 @@ void IOCard::slt_reConnect(QString strIP, uint nPort)
         if(m_qTcpSocket->waitForConnected(5000) == false)
         {
             emit sig_connectFailed(strIP);
+            logInfo(m_strIp+"_net","socket重新连接失败");
             return;
         }
     }

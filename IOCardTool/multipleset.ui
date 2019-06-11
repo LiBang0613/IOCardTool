@@ -224,6 +224,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comB_deviceType</tabstop>
+  <tabstop>le_ip1</tabstop>
+  <tabstop>le_ip2</tabstop>
+  <tabstop>le_ip3</tabstop>
+  <tabstop>le_ip4</tabstop>
+  <tabstop>pb_saveInfo</tabstop>
+  <tabstop>table_Info</tabstop>
+  <tabstop>te_showMsg</tabstop>
+  <tabstop>pb_start</tabstop>
+  <tabstop>pb_stop</tabstop>
+  <tabstop>pb_deleteSet</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

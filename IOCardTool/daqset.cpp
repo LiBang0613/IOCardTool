@@ -264,7 +264,7 @@ void DaqSet::on_pb_deleteInfo_clicked()
     if(ui->table_Msg->currentRow() != -1)
     {
         QString ip = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
-        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
+        if(m_mapCardRunTime.contains(ip))
         {
             m_mapCardRunTime.remove(ip);
             IOCard* card = m_mapIOCardObject.take(ip);

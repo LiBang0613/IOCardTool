@@ -191,7 +191,7 @@ void MultipleSet::on_pb_deleteSet_clicked()
     if(ui->table_Info->currentRow() != -1)
     {
         QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
-        if(m_mapDeviceRunTime.contains(ip) && m_mapDeviceRunTime[ip].bJudge == true)
+        if(m_mapDeviceRunTime.contains(ip))
         {
             m_mapDeviceRunTime.remove(ip);
             IODevice* device = m_mapDeviceObject.take(ip);

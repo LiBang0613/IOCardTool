@@ -123,7 +123,7 @@ void IOCard::slt_newSocket()
 //    connect(m_qTcpSocket,SIGNAL(connected()),this,SLOT(slt_tcpConnected()),Qt::QueuedConnection);
 //    connect(m_qTcpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(slt_recvSocketState(QAbstractSocket::SocketState)),Qt::QueuedConnection);
 //    connect(m_qTcpSocket,SIGNAL(readyRead()),this,SLOT(slt_readyRead()),Qt::QueuedConnection);
-//    connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
+    connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
 
     m_qTcpSocket->connectToHost(m_strIp,502);
     m_qTcpSocket->setReadBufferSize(1024);
@@ -148,6 +148,6 @@ void IOCard::slt_stopThread()
 
 void IOCard::slt_tcpDisConnected()
 {
-    qDebug()<<"disconnected";
+    qDebug()<<"disconnected断开连接"<<m_qTcpSocket->errorString();
 }
 

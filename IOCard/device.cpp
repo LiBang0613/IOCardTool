@@ -40,8 +40,7 @@ bool Device::Open(QString strIP)
         card->setTimeInterval(10);
         connect(card, SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)), this, SLOT(slt_IObuf(QString,QByteArray,QByteArray)), Qt::QueuedConnection);
         connect(card, SIGNAL(sig_statisticsCounts(QString,int,int)), this, SLOT(slt_IOCount(QString,int,int)), Qt::QueuedConnection);
-//        connect(card, SIGNAL(sig_connectFailed(QString)), this, SIGNAL(sig_connectfailed(QString)), Qt::QueuedConnection);
-        connect(card, SIGNAL(sig_connectFailed(QString)), this, SLOT(), Qt::QueuedConnection);
+        connect(card, SIGNAL(sig_connectFailed(QString)), this, SLOT(slt_connectedfailed(QString)), Qt::QueuedConnection);
 
         card->Open(vctIP[i]);
         card->startThread();
@@ -54,7 +53,7 @@ bool Device::Open(QString strIP)
         card->setTimeInterval(5);
         connect(card, SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)), this, SLOT(slt_IObuf(QString,QByteArray,QByteArray)), Qt::QueuedConnection);
         connect(card, SIGNAL(sig_statisticsCounts(QString,int,int)), this, SLOT(slt_IOCount(QString,int,int)), Qt::QueuedConnection);
-        connect(card, SIGNAL(sig_connectFailed(QString)), this, SIGNAL(sig_connectfailed(QString)), Qt::QueuedConnection);
+        connect(card, SIGNAL(sig_connectFailed(QString)), this, SLOT(slt_connectedfailed(QString)), Qt::QueuedConnection);
         card->Open(vctIP[i + m_nCountAI]);
         card->startThread();
         m_vctE1211.push_back(card);
@@ -120,6 +119,7 @@ void Device::reConnect(QString strIP, uint nPort)
     {
         m_vctE1211[i]->reConnect(vctIP[i+m_nCountAI]);
     }
+    m_bSendConnectedFailed = false;
 }
 
 void Device::start()
@@ -179,7 +179,7 @@ void Device::slt_IObuf(QString strIP, QByteArray bufSend, QByteArray bufRcv)
 void Device::slt_connectedfailed(QString strIP)
 {
     if(!m_bSendConnectedFailed)
-        emit sig_connectfailed(strIP);
+        emit sig_connectfailed(m_strDeviceIp);
 
     m_bSendConnectedFailed = true;
 }

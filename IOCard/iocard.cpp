@@ -16,7 +16,7 @@ IOCard::IOCard()
 
     m_bExitThread = false;
 
-//    connect(m_pThread,SIGNAL(finished()),m_pThread,SLOT(deleteLater()));
+    //    connect(m_pThread,SIGNAL(finished()),m_pThread,SLOT(deleteLater()));
     connect(this,SIGNAL(sig_newSocket()),this,SLOT(slt_newSocket()),Qt::QueuedConnection);
     connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread()),Qt::QueuedConnection);
 
@@ -126,9 +126,9 @@ void IOCard::slt_ProThread()
 void IOCard::slt_newSocket()
 {
     m_qTcpSocket = new QTcpSocket;
-//    connect(m_qTcpSocket,SIGNAL(connected()),this,SLOT(slt_tcpConnected()),Qt::QueuedConnection);
-//    connect(m_qTcpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(slt_recvSocketState(QAbstractSocket::SocketState)),Qt::QueuedConnection);
-//    connect(m_qTcpSocket,SIGNAL(readyRead()),this,SLOT(slt_readyRead()),Qt::QueuedConnection);
+    //    connect(m_qTcpSocket,SIGNAL(connected()),this,SLOT(slt_tcpConnected()),Qt::QueuedConnection);
+    //    connect(m_qTcpSocket,SIGNAL(stateChanged(QAbstractSocket::SocketState)),this,SLOT(slt_recvSocketState(QAbstractSocket::SocketState)),Qt::QueuedConnection);
+    //    connect(m_qTcpSocket,SIGNAL(readyRead()),this,SLOT(slt_readyRead()),Qt::QueuedConnection);
     connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
 
     m_qTcpSocket->connectToHost(m_strIp,502);
@@ -152,6 +152,11 @@ void IOCard::slt_stopThread()
     m_qTcpSocket->waitForDisconnected();
 }
 
+void IOCard::slt_tcpDisConnected()
+{
+    qDebug()<<"disconnected";
+}
+
 void IOCard::slt_reConnect(QString strIP, uint nPort)
 {
     if(m_qTcpSocket != NULL && m_qTcpSocket->state() != QTcpSocket::ConnectedState)
@@ -164,9 +169,3 @@ void IOCard::slt_reConnect(QString strIP, uint nPort)
         }
     }
 }
-
-void IOCard::slt_tcpDisConnected()
-{
-    qDebug()<<"disconnected断开连接"<<m_qTcpSocket->errorString();
-}
-

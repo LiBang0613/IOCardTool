@@ -150,9 +150,25 @@ void MultipleSet::slt_receDeviceTimes(const QString &Ip,const int& total,const i
 
 void MultipleSet::slt_recvConnectFailed(QString ip)
 {
-    if(m_mapDeviceRunTime.contains(ip))
-        m_mapDeviceRunTime[ip].bJudge = false;
-    QMessageBox::information(this,"提示","ip:"+ip+"设备连接失败。","确定");
+    if(QMessageBox::information(this,"提示","ip:"+ip+"设备连接失败，是否重新连接？","是","否")==0)
+    {
+        if(m_mapDeviceRunTime.contains(ip))
+        {
+            m_mapDeviceObject.value(ip)->reConnect(ip);
+        }
+        if(m_mapDeviceRunTime.contains(ip))
+        {
+            m_mapDeviceRunTime[ip].bJudge = false;
+        }
+        on_pb_start_clicked();
+    }
+    else
+    {
+        if(m_mapDeviceRunTime.contains(ip))
+        {
+            m_mapDeviceRunTime[ip].bJudge = false;
+        }
+    }
 }
 
 bool MultipleSet::judgeSettingInfo()

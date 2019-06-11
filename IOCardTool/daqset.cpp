@@ -283,9 +283,24 @@ void DaqSet::on_pb_deleteInfo_clicked()
 
 void DaqSet::slt_recvConnectFailed(QString ip)
 {
-    if(m_mapCardRunTime.contains(ip))
+
+    if(QMessageBox::information(this,"提示","ip:"+ip+"连接失败，是否重新连接？","是","否")==0)
     {
-        m_mapCardRunTime[ip].bJudge = false;
+        if(m_mapIOCardObject.contains(ip))
+        {
+            m_mapIOCardObject.value(ip)->reConnect(ip);
+        }
+        if(m_mapCardRunTime.contains(ip))
+        {
+            m_mapCardRunTime[ip].bJudge = false;
+        }
+        on_pb_start_clicked();
     }
-    QMessageBox::information(this,"提示","ip:"+ip+"连接失败，请检查连接。","确定");
+    else
+    {
+        if(m_mapCardRunTime.contains(ip))
+        {
+            m_mapCardRunTime[ip].bJudge = false;
+        }
+    }
 }

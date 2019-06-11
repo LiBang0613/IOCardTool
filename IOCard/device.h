@@ -15,6 +15,7 @@ public:
     virtual bool Open(QString strIP);
     // 关闭设备
     virtual bool Close();
+    virtual bool Stop();
     // 设置设备中IO模块的数量
     virtual void setDeviceCount(int nDO, int nAI); //
 

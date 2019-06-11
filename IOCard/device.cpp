@@ -63,10 +63,28 @@ bool Device::Open(QString strIP)
 bool Device::Close()
 {
     for(int i = 0; i < m_nCountAI; i++)
-        m_vctE1240[i]->stopThread();
+    {
+        m_vctE1240[i]->closeThread();
+    }
 
     for(int i = 0; i < m_nCountDO; i++)
+    {
+        m_vctE1211[i]->closeThread();
+    }
+    return true;
+}
+
+bool Device::Stop()
+{
+    for(int i = 0; i < m_nCountAI; i++)
+    {
+        m_vctE1240[i]->stopThread();
+    }
+
+    for(int i = 0; i < m_nCountDO; i++)
+    {
         m_vctE1211[i]->stopThread();
+    }
 
     return true;
 }
@@ -95,13 +113,11 @@ void Device::start()
 
     for(int i = 0; i < m_vctE1240.size(); i++)
     {
-        m_vctE1240[i]->Open(vctIP[i]);
         m_vctE1240[i]->startThread();
     }
 
     for(int i = 0; i < m_vctE1211.size(); i++)
     {
-        m_vctE1211[i]->Open(vctIP[i+m_nCountAI]);
         m_vctE1211[i]->startThread();
     }
 }

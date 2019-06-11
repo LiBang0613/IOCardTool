@@ -1,4 +1,4 @@
-#ifndef IODEVICE_H
+﻿#ifndef IODEVICE_H
 #define IODEVICE_H
 
 #include "iocard_global.h"
@@ -16,6 +16,7 @@ public:
     virtual bool Open(QString strIP) = 0;
     // 关闭设备
     virtual bool Close() = 0;
+    virtual bool Stop() = 0;
     // 设置设备中IO模块的数量
     virtual void setDeviceCount(int nDO, int nAI) = 0; //
 

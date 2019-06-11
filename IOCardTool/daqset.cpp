@@ -69,6 +69,15 @@ void DaqSet::on_pb_start_clicked()
             QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
             return;
         }
+        if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime.value(ip).bJudge == false)
+        {
+            if(m_mapIOCardObject.contains(ip))
+            {
+                m_mapCardRunTime[ip].bJudge = true;
+                m_mapIOCardObject.value(ip)->startThread();
+            }
+            return;
+        }
         RunTime time;
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
@@ -260,6 +269,7 @@ void DaqSet::on_pb_deleteInfo_clicked()
             m_mapCardRunTime.remove(ip);
             IOCard* card = m_mapIOCardObject.take(ip);
             card->stopThread();
+            card->closeThread();
             card->deleteLater();
             card = NULL;
         }

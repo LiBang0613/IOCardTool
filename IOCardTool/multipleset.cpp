@@ -71,6 +71,15 @@ void MultipleSet::on_pb_start_clicked()
             QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
             return;
         }
+        if(m_mapDeviceRunTime.contains(ip) && m_mapDeviceRunTime.value(ip).bJudge == false)
+        {
+            if(m_mapDeviceObject.contains(ip))
+            {
+                m_mapDeviceRunTime[ip].bJudge = true;
+                m_mapDeviceObject.value(ip)->start();
+            }
+            return;
+        }
         RunTime time;
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
@@ -97,7 +106,7 @@ void MultipleSet::on_pb_stop_clicked()
         if(m_mapDeviceRunTime.contains(ip) && m_mapDeviceRunTime[ip].bJudge == true)
         {
             m_mapDeviceRunTime[ip].bJudge = false;
-            m_mapDeviceObject.value(ip)->Close();
+            m_mapDeviceObject.value(ip)->Stop();
         }
     }
     else
@@ -108,15 +117,15 @@ void MultipleSet::on_pb_stop_clicked()
 
 void MultipleSet::slt_clearTextEdit()
 {
-    qDebug()<<ui->te_showMsg->toPlainText().toLatin1().size();
+//    qDebug()<<ui->te_showMsg->toPlainText().toLatin1().size();
     if(ui->te_showMsg->toPlainText().toLatin1().size() > 10000*5)
         ui->te_showMsg->clear();
 }
 
 void MultipleSet::slt_recvDeviceInfo(const QString &ip, const QByteArray &before, const QByteArray &after)
 {
-        QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
-        ui->te_showMsg->append((text));
+    QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
+    ui->te_showMsg->append((text));
 }
 
 void MultipleSet::slt_receDeviceTimes(const QString &Ip,const int& total,const int &failed)
@@ -186,6 +195,7 @@ void MultipleSet::on_pb_deleteSet_clicked()
         {
             m_mapDeviceRunTime.remove(ip);
             IODevice* device = m_mapDeviceObject.take(ip);
+            device->Stop();
             device->Close();
             device->deleteLater();
             device = NULL;

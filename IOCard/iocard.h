@@ -51,6 +51,8 @@ public:
     void stopThread();
 
     void setTimeInterval(int second);
+
+    void closeThread();
 public:
     int m_nSendTimes;
     int m_nFailedTimes;

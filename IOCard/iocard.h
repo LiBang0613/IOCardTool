@@ -43,6 +43,8 @@ public:
 public:
     //连接指定Ip地址
     bool Open(QString strIp,uint nPort = 502);
+    //重连
+    void reConnect(QString strIP, uint nPort = 502);
     //设置读写寄存器 /线圈数量
     virtual void setBitCount(int nCount);
     //启动通讯线程
@@ -69,6 +71,7 @@ protected slots:
     void slt_newSocket();
     void slt_stopThread();
 
+    void slt_reConnect(QString strIP, uint nPort = 502);
 signals:
     //统计数据信号，发送多少次命令，失败多少次
     void sig_statisticsCounts(QString,int,int);
@@ -82,6 +85,8 @@ signals:
     void sig_operate();
 
     void sig_connectFailed(QString);
+
+    void sig_reConnect(QString strIP, uint nPort = 502);
 protected:
     QThread *m_pThread;
     QTcpSocket *m_qTcpSocket;

@@ -56,6 +56,11 @@ bool IOCard::Open(QString strIp, uint nPort)
     return true;
 }
 
+void IOCard::reConnect(QString strIP, uint nPort)
+{
+    emit sig_reConnect(strIP, nPort);
+}
+
 void IOCard::setBitCount(int nCount)
 {
     m_nBitCount = nCount;
@@ -144,6 +149,19 @@ void IOCard::slt_stopThread()
     if(m_qTcpSocket->state() == QTcpSocket::ConnectedState)
         m_qTcpSocket->disconnectFromHost();
     m_qTcpSocket->waitForDisconnected();
+}
+
+void IOCard::slt_reConnect(QString strIP, uint nPort)
+{
+    if(m_qTcpSocket != NULL && m_qTcpSocket->state() != QTcpSocket::ConnectedState)
+    {
+        m_qTcpSocket->connectToHost(strIP, nPort);
+        if(m_qTcpSocket->waitForConnected(5000) == false)
+        {
+            emit sig_connectFailed(strIP);
+            return;
+        }
+    }
 }
 
 void IOCard::slt_tcpDisConnected()

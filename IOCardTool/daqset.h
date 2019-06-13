@@ -9,6 +9,9 @@
 #include "iocard.h"
 #include "e1240.h"
 #include "e1211.h"
+#include "smacqdo.h"
+#include "smacqai.h"
+#include "scamqaido.h"
 
 struct RunTime
 {
@@ -76,6 +79,7 @@ private:
     QTimer m_clearTextTimer;                    //清除文本框信息的定时器，信息很多会导致内存上升。
     QMap<QString,RunTime> m_mapCardRunTime;     //记录数采卡开始的时间，用于更新数采卡连接总时间。
     QMap<QString,IOCard*>m_mapIOCardObject;   //保存数采卡对象，key=ip，
+    QMutex m_mutex;
 };
 
 #endif // DAQSET_H

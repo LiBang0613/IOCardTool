@@ -97,6 +97,17 @@ void IOCard::closeThread()
     logInfo(m_strIp+"_net","关闭线程");
 }
 
+void IOCard::setDeviceAddress(int addr)
+{
+    m_nSmacqAddr  = addr;
+}
+
+void IOCard::setMutex(QMutex *mutex)
+{
+
+    m_mutex = mutex;
+    qDebug()<<m_mutex;
+}
 
 void IOCard::slt_ProThread()
 {
@@ -125,6 +136,7 @@ void IOCard::slt_newSocket()
     if(!m_qTcpSocket->waitForConnected(5000))
     {
         logInfo(m_strIp+"_net","ip地址连接失败");
+        qDebug()<<m_qTcpSocket->errorString();
         stopThread();
         emit sig_connectFailed(m_strIp);
         return;

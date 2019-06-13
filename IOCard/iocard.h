@@ -10,7 +10,7 @@
 
 enum WriteState
 {
-     wsIni = 1
+    wsIni = 1
     ,wsReady = 2
     ,wsEnd = 3
 };
@@ -55,6 +55,10 @@ public:
     void setTimeInterval(int second);
 
     void closeThread();
+
+    void setDeviceAddress(int addr);
+
+    void setMutex(QMutex* mutex);
 public:
     int m_nSendTimes;
     int m_nFailedTimes;
@@ -96,12 +100,17 @@ protected:
     QString m_strIp;            // 设备IP地址
     int m_nBitCount;            // 可控的线圈/寄存器数量
     int m_nTimeInterval;        // 命令发送时间间隔，单位：ms
+    int m_nSmacqAddr;           //思迈科华设备地址。
+    QMutex *m_mutex;
+
 public:
     QByteArray m_sendArray;     // 保存设备发送的命令
 
 private:
     bool m_bNewSocket;          // socket是否已存在
     bool m_bExitThread;         // 是否退出线程函数  true - 退出, false - 不退出
+
+
 };
 
 #endif // IOCARD_H

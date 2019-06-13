@@ -149,9 +149,8 @@ bool E1211::Response_Write(QByteArray recvBuf, int nLen)
 void E1211::Process()
 {
     QThread::msleep(m_nTimeInterval);
-    QMutex mutex;
-    mutex.lock();
 
+    m_mutex->lock();
     QByteArray sendArray;
     int nLen = 0;
 
@@ -170,11 +169,11 @@ void E1211::Process()
 
     if(m_qTcpSocket->waitForReadyRead() == false)
     {
+        m_mutex->unlock();
         return ;
     }
     slt_readyRead();
-    mutex.unlock();
-
+    m_mutex->unlock();
 }
 
 void E1211::WriteCmdDO()

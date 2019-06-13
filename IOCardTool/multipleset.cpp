@@ -63,6 +63,7 @@ void MultipleSet::on_pb_start_clicked()
 {
     if(ui->table_Info->currentRow() != -1)
     {
+        QString deviceName = ui->table_Info->item(ui->table_Info->currentRow(),0)->text();
         QString ip = ui->table_Info->item(ui->table_Info->currentRow(),1)->text();
         int nDoCount = ui->table_Info->item(ui->table_Info->currentRow(),2)->text().toInt();
         int nAiCount = ui->table_Info->item(ui->table_Info->currentRow(),3)->text().toInt();
@@ -84,7 +85,11 @@ void MultipleSet::on_pb_start_clicked()
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
         m_mapDeviceRunTime.insert(ip,time);
-        IODevice* device = new Device;
+        IODevice* device;
+        if(deviceName == "仪器1")
+        {
+            device = new Device;
+        }
         connect(device,SIGNAL(sig_connectfailed(QString)),this,SLOT(slt_recvConnectFailed(QString)),Qt::QueuedConnection);
         connect(device,SIGNAL(sig_IOCount(QString,int,int)),this,SLOT(slt_receDeviceTimes(QString,int,int)),Qt::QueuedConnection);
         connect(device,SIGNAL(sig_IObuf(QString,QByteArray,QByteArray)),this,SLOT(slt_recvDeviceInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
@@ -158,7 +163,7 @@ void MultipleSet::slt_recvConnectFailed(QString ip)
         {
             m_mapDeviceRunTime[ip].bJudge = false;
         }
-        on_pb_start_clicked();
+//        on_pb_start_clicked();
     }
     else
     {

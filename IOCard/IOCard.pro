@@ -27,7 +27,10 @@ SOURCES += iocard.cpp \
     e1211.cpp \
     e1240.cpp \
     logexport.cpp \
-    device.cpp
+    device.cpp \
+    smacqai.cpp \
+    smacqdo.cpp \
+    scamqaido.cpp
 
 HEADERS += iocard.h\
         iocard_global.h \
@@ -35,7 +38,10 @@ HEADERS += iocard.h\
     e1240.h \
     logexport.h \
     iodevice.h \
-    device.h
+    device.h \
+    smacqai.h \
+    smacqdo.h \
+    scamqaido.h
 
 unix {
     target.path = /usr/lib

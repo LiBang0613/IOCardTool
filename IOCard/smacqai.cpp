@@ -142,7 +142,7 @@ bool SmacqAI::Query_SetSpeedAI(QByteArray &pBuf, int &nLen)
     pBuf[i++] = 0x9c;
     pBuf[i++] = 0xb9;
     pBuf[i++] = 0x00;
-    pBuf[i++] = 0x03;
+    pBuf[i++] = 0x04;
     nLen = i;
     return true;
 }

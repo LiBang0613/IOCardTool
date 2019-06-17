@@ -220,7 +220,7 @@
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>时间间隔</string>
+           <string>时间间隔(ms)</string>
           </property>
          </widget>
         </item>
@@ -329,7 +329,7 @@
       <enum>Qt::SolidLine</enum>
      </property>
      <attribute name="horizontalHeaderVisible">
-      <bool>false</bool>
+      <bool>true</bool>
      </attribute>
      <attribute name="horizontalHeaderCascadingSectionResizes">
       <bool>false</bool>
@@ -360,7 +360,7 @@
      </column>
      <column>
       <property name="text">
-       <string>时间间隔</string>
+       <string>时间间隔(ms)</string>
       </property>
      </column>
      <column>
@@ -370,7 +370,7 @@
      </column>
      <column>
       <property name="text">
-       <string>总时长(秒)</string>
+       <string>总时长(s)</string>
       </property>
      </column>
      <column>

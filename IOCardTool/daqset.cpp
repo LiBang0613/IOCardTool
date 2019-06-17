@@ -175,13 +175,13 @@ void DaqSet::slt_clearTxetEdit()
 
 void DaqSet::slt_recvCardInfo(QString ip, QByteArray before, QByteArray after)
 {
-    QString text = "Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
+    QString text ="time:"+QDateTime::currentDateTime().toString("yyyyMMdd hh:mm:ss:zzz")+" Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
     ui->te_showMsg->append((text));
 }
 
 void DaqSet::slt_receCardTimes(QString Ip, int total, int failed)
 {
-    qDebug()<<Ip;
+//    qDebug()<<Ip;
     for(int i=0;i<ui->table_Msg->rowCount();++i)
     {
         if(Ip == ui->table_Msg->item(i,2)->text())

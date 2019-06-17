@@ -21,6 +21,7 @@ ScamqAIDO::~ScamqAIDO()
 
 void ScamqAIDO::Process()
 {
+    QThread::msleep(m_nTimeInterval);
     m_unTime += 2;
 
     QByteArray cSendBuf;
@@ -69,6 +70,7 @@ void ScamqAIDO::Process()
     cSendBuf[nSendLen++] = cHighCRC;
 
     int nLen = m_qTcpSocket->write(cSendBuf);
+    QDateTime sendTime = QDateTime::currentDateTime();
     m_qTcpSocket->flush();
     m_nSendTimes++;
     if( nSendLen != nLen)	//SOCKET_ERROR
@@ -89,7 +91,8 @@ void ScamqAIDO::Process()
     QByteArray cRcvBuf;
     cRcvBuf = m_qTcpSocket->readAll();
     int nRcvLen = cRcvBuf.size();
-
+    QDateTime recvTime = QDateTime::currentDateTime();
+    int nTime = sendTime.msecsTo(recvTime);
     if (m_bWriteDO)
     {
         Response_WriteDO(cRcvBuf, nRcvLen);
@@ -112,9 +115,11 @@ void ScamqAIDO::Process()
             Response_ReadAI(cRcvBuf, nRcvLen);
         }
     }
+    qDebug()<<"time"<<nTime;
     emit sig_statisticsCounts(m_strIp+"|"+QString::number(m_nSmacqAddr),m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:思迈科华",cSendBuf,cRcvBuf);
-    logInfo(m_strIp+"|"+QString::number(m_nSmacqAddr)+"_data","type:思迈科华 send:"+(QString)cSendBuf.toHex()+" recv:"+(QString)cRcvBuf.toHex());
+    qDebug()<<m_strIp+"|"+QString::number(m_nSmacqAddr)+"_data";
+    logInfo(m_strIp+"_"+QString::number(m_nSmacqAddr)+"_data","type:思迈科华 send:"+(QString)cSendBuf.toHex()+" recv:"+(QString)cRcvBuf.toHex());
 }
 
 ushort ScamqAIDO::CalCRC(QByteArray &pBuf, int nBufLen)
@@ -151,7 +156,7 @@ bool ScamqAIDO::Query_ReadAI(QByteArray &pBuf, int &nLen)
     pBuf[i++] = 0x75;
     pBuf[i++] = (uchar)0x95;
     pBuf[i++] = 0x00;
-    pBuf[i++] = 0x08;	// 8个AI
+    pBuf[i++] = m_nBitCount;	// 8个AI
     nLen = i;
 
 
@@ -161,7 +166,7 @@ bool ScamqAIDO::Query_ReadAI(QByteArray &pBuf, int &nLen)
 void ScamqAIDO::Response_ReadAI(QByteArray &pBuf, const int &nLen)
 {
     // 1. 接收长度校验
-    if ( nLen != 3 + 2 + 8 * 2)
+    if ( nLen != 3 + 2 + m_nBitCount * 2)
     {
         m_nFailedTimes++;
         qDebug()<<"失败11111"<<pBuf;
@@ -170,7 +175,7 @@ void ScamqAIDO::Response_ReadAI(QByteArray &pBuf, const int &nLen)
     // 2. 功能码+数据长度校验
     if ( pBuf[0].operator !=(0x01)
          ||  pBuf[1].operator !=(0x04)   //设备地址变量
-         ||  pBuf[2].operator !=(8 * 2)
+         ||  pBuf[2].operator !=(m_nBitCount * 2)
          )
     {
         m_nFailedTimes++;
@@ -180,7 +185,7 @@ void ScamqAIDO::Response_ReadAI(QByteArray &pBuf, const int &nLen)
 
     ushort wVal = 0;
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 4; i++)
     {
         uchar ucB1  = (uchar)pBuf[i * 2 + 2 + 1];
         uchar ucB2  = (uchar)pBuf[i * 2 + 2 + 2];

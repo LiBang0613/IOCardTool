@@ -81,7 +81,7 @@ void YD516P::slt_readyRead()
     QByteArray recvArray = m_qTcpSocket->readAll();
     Response_Read(recvArray,recvArray.size());
     qDebug()<<"1240"<<QThread::currentThreadId()<<recvArray<<recvArray.size();
-    emit sig_statisticsCounts(m_strIp,m_nSendTimes,m_nFailedTimes);
+    emit sig_statisticsCounts(m_strIp+"|"+QString::number(m_nSmacqAddr),m_nSendTimes,m_nFailedTimes);
     emit sig_sendRecv(m_strIp+" type:516P",m_sendArray,recvArray);
     logInfo(m_strIp+"_data"," type:516P send:"+(QString)m_sendArray.toHex()+"recv:"+(QString)recvArray.toHex());
 }

@@ -162,7 +162,7 @@ void IOCard::slt_stopThread()
 
 void IOCard::slt_tcpDisConnected()
 {
-    qDebug()<<"disconnected";
+    qDebug()<<"disconnected"<<m_qTcpSocket->errorString();
     logInfo(m_strIp+"_net","socket主动断开连接，disconnect");
 }
 

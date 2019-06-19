@@ -11,6 +11,7 @@ enum DeviceType
     dtDevice2 = 1,			//仪器2根据需求暂定3个1211
     dtDevice3 = 2,			//仪器3根据需求暂定3个1240
     dtDevice4 = 3,			//仪器4根据需求暂定2个1240和1个1211
+    dtDevice5 = 4,
 };
 
 namespace Ui {

@@ -12,11 +12,34 @@
 #include "smacqdo.h"
 #include "smacqai.h"
 #include "scamqaido.h"
+#include "yd516p.h"
 
 struct RunTime
 {
     bool bJudge;            //开始测试或者停止的标志
     QString strBeginTime;   //开始测试的时间
+};
+
+struct CardInfo
+{
+    QString strIp;
+    QString strDeviceAddr;
+    QString strCardType;
+    QString strSuffix;
+    int nBitCount;
+    int nTimeInterval;
+    int nPort;
+public:
+    CardInfo()
+    {
+        strIp           = "";
+        strDeviceAddr	= "";
+        strCardType 	= "";
+        strSuffix       = "";
+        nBitCount		= 0;
+        nTimeInterval   = 0;
+        nPort           = 0;
+    }
 };
 
 
@@ -73,6 +96,10 @@ private:
     QString getIpAddr();
     //初始化页面资源
     void initPage();
+    //根据数采卡类型生成不同的数采卡对象。
+    IOCard* getIOCardObject(QString cardType);
+    //根据表格选中行信息生成保存配置信息的结构体
+    CardInfo getCardInfo();
 
 private:
     Ui::DaqSet *ui;

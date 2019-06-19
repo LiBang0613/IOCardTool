@@ -110,6 +110,11 @@
             <string>思迈科华</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>宇电</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>
@@ -203,6 +208,16 @@
       </item>
       <item row="1" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>端口号</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="le_port"/>
+        </item>
         <item>
          <widget class="QLabel" name="label_10">
           <property name="text">
@@ -360,6 +375,11 @@
      </column>
      <column>
       <property name="text">
+       <string>端口号</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>时间间隔(ms)</string>
       </property>
      </column>
@@ -409,6 +429,7 @@
   <tabstop>comB_cardType</tabstop>
   <tabstop>le_timeInterval</tabstop>
   <tabstop>sb_pass</tabstop>
+  <tabstop>le_port</tabstop>
   <tabstop>le_deviceAddr</tabstop>
   <tabstop>le_ip1</tabstop>
   <tabstop>le_ip2</tabstop>

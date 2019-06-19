@@ -52,8 +52,9 @@ void DaqSet::on_pb_saveInfo_clicked()
     ui->table_Msg->setItem(row,1,new QTableWidgetItem(ui->comB_cardType->currentText().trimmed()));
     QString ip = getIpAddr();
     ui->table_Msg->setItem(row,2,new QTableWidgetItem(ip));
-    ui->table_Msg->setItem(row,3,new QTableWidgetItem(ui->le_timeInterval->text().trimmed()));
-    ui->table_Msg->setItem(row,4,new QTableWidgetItem(QString::number(ui->sb_pass->value())));
+    ui->table_Msg->setItem(row,3,new QTableWidgetItem(ui->le_port->text().trimmed()));
+    ui->table_Msg->setItem(row,4,new QTableWidgetItem(ui->le_timeInterval->text().trimmed()));
+    ui->table_Msg->setItem(row,5,new QTableWidgetItem(QString::number(ui->sb_pass->value())));
     ui->table_Msg->horizontalHeader()->show();
 }
 
@@ -61,87 +62,53 @@ void DaqSet::on_pb_start_clicked()
 {
     if(ui->table_Msg->currentRow() != -1)
     {
-
-        QString ip = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
-        QString deviceAddr;
-        QString strData = "";
-        if(ip.contains("|"))
-        {
-            QStringList list = ip.split("|");
-            ip = list.at(0);
-            deviceAddr = list.at(1);
-            strData = "|"+deviceAddr;
-            qDebug()<<ip<<deviceAddr;
-        }
-        QString cardType = ui->table_Msg->item(ui->table_Msg->currentRow(),1)->text();
-        int interval = ui->table_Msg->item(ui->table_Msg->currentRow(),3)->text().toInt();
-        int count = ui->table_Msg->item(ui->table_Msg->currentRow(),4)->text().toInt();
-        if(m_mapCardRunTime.contains(ip+strData) && m_mapCardRunTime.value(ip+strData).bJudge == true)
+        CardInfo cInfo = getCardInfo();
+        if(m_mapCardRunTime.contains(cInfo.strIp+cInfo.strSuffix)
+                && m_mapCardRunTime.value(cInfo.strIp+cInfo.strSuffix).bJudge == true)
         {
             QMessageBox::information(this,"提示","请勿重复点击开始测试。","确定");
             return;
         }
-        if(m_mapCardRunTime.contains(ip+strData) && m_mapCardRunTime.value(ip+strData).bJudge == false)
+        if(m_mapCardRunTime.contains(cInfo.strIp+cInfo.strSuffix)
+                && m_mapCardRunTime.value(cInfo.strIp+cInfo.strSuffix).bJudge == false)
         {
-            if(m_mapIOCardObject.contains(ip+strData))
+            if(m_mapIOCardObject.contains(cInfo.strIp+cInfo.strSuffix))
             {
-                m_mapCardRunTime[ip+strData].bJudge = true;
-                m_mapIOCardObject.value(ip+strData)->startThread();
+                m_mapCardRunTime[cInfo.strIp+cInfo.strSuffix].bJudge = true;
+                m_mapIOCardObject.value(cInfo.strIp+cInfo.strSuffix)->startThread();
             }
             return;
         }
         RunTime time;
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
-        if(!deviceAddr.isEmpty())
+        if(!cInfo.strSuffix.isEmpty())
         {
-            QString str = ip+"|"+deviceAddr;
-            m_mapCardRunTime.insert(str,time);
+            m_mapCardRunTime.insert(cInfo.strIp+cInfo.strSuffix,time);
         }
         else
         {
-            m_mapCardRunTime.insert(ip,time);
+            m_mapCardRunTime.insert(cInfo.strIp,time);
         }
-        IOCard* card;
-        if(cardType == "1211")
-        {
-            card = new E1211;
-        }
-        else if(cardType == "1240")
-        {
-            card = new E1240;
-        }
-        else if(cardType == "思迈科华AI")
-        {
-            card = new SmacqAI;
-            card->setDeviceAddress(deviceAddr.toInt());
-        }
-        else if(cardType == "思迈科华DO")
-        {
-            card = new SmacqDO;
-            card->setDeviceAddress(deviceAddr.toInt());
-        }
-        else if(cardType == "思迈科华")
-        {
-            card = new ScamqAIDO;
-            card->setDeviceAddress(deviceAddr.toInt());
-        }
+        IOCard* card = getIOCardObject(cInfo.strCardType);
+        if(card == NULL)
+            return;
         connect(card,SIGNAL(sig_sendRecv(QString,QByteArray,QByteArray)),this,SLOT(slt_recvCardInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
         connect(card,SIGNAL(sig_statisticsCounts(QString,int,int)),this,SLOT(slt_receCardTimes(QString,int,int)),Qt::QueuedConnection);
         connect(card,SIGNAL(sig_connectFailed(QString)),this,SLOT(slt_recvConnectFailed(QString)),Qt::QueuedConnection);
-        card->setBitCount(count);
+        card->setBitCount(cInfo.nBitCount);
         card->setMutex(&m_mutex);
-        card->setTimeInterval(interval);
-        card->Open(ip);
+        card->setTimeInterval(cInfo.nTimeInterval);
+        card->setDeviceAddress(cInfo.strDeviceAddr.toInt());
+        card->Open(cInfo.strIp,cInfo.nPort);
         card->startThread();
-        if(!deviceAddr.isEmpty())
+        if(!cInfo.strDeviceAddr.isEmpty())
         {
-            QString str = ip+"|"+deviceAddr;
-            m_mapIOCardObject.insert(str,card);
+            m_mapIOCardObject.insert(cInfo.strIp+cInfo.strSuffix,card);
         }
         else
         {
-            m_mapIOCardObject.insert(ip,card);
+            m_mapIOCardObject.insert(cInfo.strIp,card);
         }
     }
     else
@@ -158,7 +125,8 @@ void DaqSet::on_pb_stop_clicked()
         if(m_mapCardRunTime.contains(ip) && m_mapCardRunTime[ip].bJudge == true)
         {
             m_mapCardRunTime[ip].bJudge = false;
-            m_mapIOCardObject.value(ip)->stopThread();
+            if(m_mapIOCardObject.contains(ip))
+                m_mapIOCardObject.value(ip)->stopThread();
         }
     }
     else
@@ -176,12 +144,13 @@ void DaqSet::slt_clearTxetEdit()
 void DaqSet::slt_recvCardInfo(QString ip, QByteArray before, QByteArray after)
 {
     QString text ="time:"+QDateTime::currentDateTime().toString("yyyyMMdd hh:mm:ss:zzz")+" Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
-    ui->te_showMsg->append((text));
+//    qDebug()<<text;
+        ui->te_showMsg->append((text));
 }
 
 void DaqSet::slt_receCardTimes(QString Ip, int total, int failed)
 {
-//    qDebug()<<Ip;
+    //    qDebug()<<Ip;
     for(int i=0;i<ui->table_Msg->rowCount();++i)
     {
         if(Ip == ui->table_Msg->item(i,2)->text())
@@ -191,9 +160,9 @@ void DaqSet::slt_receCardTimes(QString Ip, int total, int failed)
             {
                 QDateTime beginTime = QDateTime::fromString(m_mapCardRunTime.value(Ip).strBeginTime,"yyyyMMddhhmmss");
                 int second = beginTime.secsTo(QDateTime::currentDateTime());
-                ui->table_Msg->setItem(i,5,new QTableWidgetItem(QString::number(second)));
-                ui->table_Msg->setItem(i,6,new QTableWidgetItem(QString::number(total)));
-                ui->table_Msg->setItem(i,7,new QTableWidgetItem(QString::number(failed)));
+                ui->table_Msg->setItem(i,6,new QTableWidgetItem(QString::number(second)));
+                ui->table_Msg->setItem(i,7,new QTableWidgetItem(QString::number(total)));
+                ui->table_Msg->setItem(i,8,new QTableWidgetItem(QString::number(failed)));
             }
         }
     }
@@ -262,6 +231,11 @@ bool DaqSet::judgeSettingInfo()
         QMessageBox::information(this,"提示","请输入思迈科华对应的数采卡设备地址。","确定");
         return false;
     }
+    if(ui->le_port->text().isEmpty())
+    {
+        QMessageBox::information(this,"提示","请输入正确端口号。","确定");
+        return false;
+    }
 
     if(ui->le_ip1->text().trimmed().isEmpty() ||
             ui->le_ip2->text().trimmed().isEmpty() ||
@@ -314,6 +288,57 @@ void DaqSet::initPage()
     ui->le_ip3->setValidator(new QIntValidator(0,255,ui->le_ip3));
     ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
     ui->le_timeInterval->setValidator(new QIntValidator(0,999999,ui->le_timeInterval));
+    ui->le_port->setValidator(new QIntValidator(0,999999,ui->le_port));
+    ui->table_Msg->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+IOCard *DaqSet::getIOCardObject(QString cardType)
+{
+    IOCard* card = NULL;
+    if(cardType == "1211")
+    {
+        card = new E1211;
+    }
+    else if(cardType == "1240")
+    {
+        card = new E1240;
+    }
+    else if(cardType == "思迈科华AI")
+    {
+        card = new SmacqAI;
+    }
+    else if(cardType == "思迈科华DO")
+    {
+        card = new SmacqDO;
+    }
+    else if(cardType == "思迈科华")
+    {
+        card = new ScamqAIDO;
+    }
+    else if(cardType == "宇电")
+    {
+        card = new YD516P;
+    }
+
+    return card;
+}
+
+CardInfo DaqSet::getCardInfo()
+{
+    CardInfo info;;
+    info.strIp = ui->table_Msg->item(ui->table_Msg->currentRow(),2)->text();
+    if(info.strIp.contains("|"))
+    {
+        QStringList list = info.strIp.split("|");
+        info.strIp = list.at(0);
+        info.strDeviceAddr = list.at(1);
+        info.strSuffix = "|"+info.strDeviceAddr;
+    }
+    info.strCardType = ui->table_Msg->item(ui->table_Msg->currentRow(),1)->text();
+    info.nPort = ui->table_Msg->item(ui->table_Msg->currentRow(),3)->text().toInt();
+    info.nTimeInterval = ui->table_Msg->item(ui->table_Msg->currentRow(),4)->text().toInt();
+    info.nBitCount = ui->table_Msg->item(ui->table_Msg->currentRow(),5)->text().toInt();
+    return info;
 }
 
 void DaqSet::on_pb_deleteInfo_clicked()
@@ -324,12 +349,15 @@ void DaqSet::on_pb_deleteInfo_clicked()
         if(m_mapCardRunTime.contains(ip))
         {
             m_mapCardRunTime.remove(ip);
-            IOCard* card = m_mapIOCardObject.take(ip);
-            card->stopThread();
-            card->closeThread();
-            delete card;
-            //            card->deleteLater();
-            card = NULL;
+            if(m_mapIOCardObject.contains(ip))
+            {
+                IOCard* card = m_mapIOCardObject.take(ip);
+                card->stopThread();
+                card->closeThread();
+                delete card;
+                //            card->deleteLater();
+                card = NULL;
+            }
         }
         ui->table_Msg->removeRow(ui->table_Msg->currentRow());
     }

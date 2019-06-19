@@ -12,16 +12,17 @@ IOCard::IOCard()
     m_nFailedTimes = 0;
     m_nTimeInterval = 1000;
     m_bNewSocket = false;
+    m_nPort = 0;
     m_pThread = new QThread;
 
     m_bExitThread = false;
 
     //    connect(m_pThread,SIGNAL(finished()),m_pThread,SLOT(deleteLater()));
-    connect(this,SIGNAL(sig_newSocket()),this,SLOT(slt_newSocket()),Qt::QueuedConnection);
-    connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread()),Qt::QueuedConnection);
+    connect(this,SIGNAL(sig_newSocket()),this,SLOT(slt_newSocket())/*,Qt::QueuedConnection*/);
+    connect(this,SIGNAL(sig_stopThread()),this,SLOT(slt_stopThread())/*,Qt::QueuedConnection*/);
 
-    connect(this, SIGNAL(sig_operate()), this, SLOT(slt_ProThread()), Qt::QueuedConnection);
-    connect(this, SIGNAL(sig_reConnect(QString,uint)), this, SLOT(slt_reConnect(QString,uint)), Qt::QueuedConnection);
+    connect(this, SIGNAL(sig_operate()), this, SLOT(slt_ProThread())/*, Qt::QueuedConnection*/);
+    connect(this, SIGNAL(sig_reConnect(QString,uint)), this, SLOT(slt_reConnect(QString,uint))/*, Qt::QueuedConnection*/);
 }
 
 IOCard::~IOCard()
@@ -41,6 +42,7 @@ bool IOCard::Open(QString strIp, uint nPort)
     if(!m_pThread->isRunning())
         m_pThread->start();
     m_strIp = strIp;
+    m_nPort = nPort;
     if(!m_bNewSocket)
     {
         emit sig_newSocket();
@@ -59,7 +61,7 @@ bool IOCard::Open(QString strIp, uint nPort)
 
 void IOCard::reConnect(QString strIP, uint nPort)
 {
-    emit sig_reConnect(strIP, nPort);
+    emit sig_reConnect(strIP, m_nPort);
 }
 
 void IOCard::setBitCount(int nCount)
@@ -112,8 +114,10 @@ void IOCard::setMutex(QMutex *mutex)
 void IOCard::slt_ProThread()
 {
     qDebug()<<"slt_proThread"<<QThread::currentThreadId()<<m_qTcpSocket->state();
+
     while(!m_bExitThread)
     {
+//        m_mutex->lock();
         if(m_qTcpSocket->state() == QTcpSocket::ConnectedState)
         {
             Process();
@@ -123,7 +127,9 @@ void IOCard::slt_ProThread()
             stopThread();
             emit sig_connectFailed(m_strIp);
         }
+//        m_mutex->unlock();
     }
+
 }
 
 void IOCard::slt_newSocket()
@@ -131,7 +137,7 @@ void IOCard::slt_newSocket()
     m_qTcpSocket = new QTcpSocket;
     connect(m_qTcpSocket,SIGNAL(disconnected()),this,SLOT(slt_tcpDisConnected()),Qt::QueuedConnection);
 
-    m_qTcpSocket->connectToHost(m_strIp,502);
+    m_qTcpSocket->connectToHost(m_strIp,m_nPort);
     m_qTcpSocket->setReadBufferSize(1024);
     if(!m_qTcpSocket->waitForConnected(5000))
     {

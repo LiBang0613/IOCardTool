@@ -27,6 +27,7 @@ void SmacqDO::setBitCount(int nCount)
 void SmacqDO::Process()
 {
     QThread::msleep(m_nTimeInterval);
+
     m_mutex->lock();
     QByteArray cSendBuf;
     int nSendLen = 0;
@@ -60,7 +61,7 @@ void SmacqDO::Process()
         return ;
     }
 
-    if(m_qTcpSocket->waitForReadyRead() == false)
+    if(m_qTcpSocket->waitForReadyRead(1000) == false)
     {
         m_nFailedTimes++;
         qDebug()<<"readyread error";

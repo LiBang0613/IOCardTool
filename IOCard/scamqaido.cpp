@@ -22,6 +22,8 @@ ScamqAIDO::~ScamqAIDO()
 void ScamqAIDO::Process()
 {
     QThread::msleep(m_nTimeInterval);
+    QMutexLocker locker(m_mutex);
+
     m_unTime += 2;
 
     QByteArray cSendBuf;
@@ -81,7 +83,7 @@ void ScamqAIDO::Process()
         return;
     }
 
-    if(m_qTcpSocket->waitForReadyRead() == false)
+    if(m_qTcpSocket->waitForReadyRead(m_nTimeInterval) == false)
     {
         m_nFailedTimes++;
         logError(m_strIp+"|"+QString::number(m_nSmacqAddr)+"_data","1240发送数据错误");

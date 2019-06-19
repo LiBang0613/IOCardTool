@@ -30,7 +30,8 @@ SOURCES += iocard.cpp \
     device.cpp \
     smacqai.cpp \
     smacqdo.cpp \
-    scamqaido.cpp
+    scamqaido.cpp \
+    yd516p.cpp
 
 HEADERS += iocard.h\
         iocard_global.h \
@@ -41,7 +42,8 @@ HEADERS += iocard.h\
     device.h \
     smacqai.h \
     smacqdo.h \
-    scamqaido.h
+    scamqaido.h \
+    yd516p.h
 
 unix {
     target.path = /usr/lib

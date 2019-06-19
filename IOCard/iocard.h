@@ -98,6 +98,7 @@ protected:
     QThread *m_pThread;
     QTcpSocket *m_qTcpSocket;
     QString m_strIp;            // 设备IP地址
+    int m_nPort;
     int m_nBitCount;            // 可控的线圈/寄存器数量
     int m_nTimeInterval;        // 命令发送时间间隔，单位：ms
     int m_nSmacqAddr;           //思迈科华设备地址。

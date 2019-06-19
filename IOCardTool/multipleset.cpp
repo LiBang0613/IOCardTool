@@ -15,6 +15,7 @@ MultipleSet::MultipleSet(QWidget *parent) :
     ui->le_ip4->setValidator(new QIntValidator(0,255,ui->le_ip4));
     connect(&m_clearTextTimer,SIGNAL(timeout()),this,SLOT(slt_clearTextEdit()));
     m_clearTextTimer.start(1000);
+    ui->table_Info->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 MultipleSet::~MultipleSet()
@@ -30,7 +31,7 @@ void MultipleSet::on_pb_saveInfo_clicked()
     }
     int row = ui->table_Info->rowCount();
     ui->table_Info->insertRow(row);
-    int num1211,num1240;
+    int num1211 = 0,num1240 = 0,smacq = 0;
     switch (ui->comB_deviceType->currentIndex())
     {
     case dtDevice1:
@@ -49,14 +50,20 @@ void MultipleSet::on_pb_saveInfo_clicked()
         num1211 = 1;
         num1240 = 2;
         break;
+    case dtDevice5:
+        num1211 = 0;
+        num1240 = 0;
+        smacq = 2;
+        break;
     }
     ui->table_Info->setItem(row,0,new QTableWidgetItem(ui->comB_deviceType->currentText().trimmed()));
     ui->table_Info->setItem(row,1,new QTableWidgetItem(getIpAddr()));
     ui->table_Info->setItem(row,2,new QTableWidgetItem(QString::number(num1211)));
     ui->table_Info->setItem(row,3,new QTableWidgetItem(QString::number(num1240)));
-    ui->table_Info->setItem(row,4,new QTableWidgetItem());
+    ui->table_Info->setItem(row,4,new QTableWidgetItem(QString::number(smacq)));
     ui->table_Info->setItem(row,5,new QTableWidgetItem());
     ui->table_Info->setItem(row,6,new QTableWidgetItem());
+    ui->table_Info->setItem(row,7,new QTableWidgetItem());
 }
 
 void MultipleSet::on_pb_start_clicked()
@@ -85,11 +92,17 @@ void MultipleSet::on_pb_start_clicked()
         time.bJudge = true;
         time.strBeginTime = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
         m_mapDeviceRunTime.insert(ip,time);
-        IODevice* device;
+        IODevice* device = nullptr;
         if(deviceName == "仪器1")
         {
             device = new Device;
         }
+        else if(deviceName == "Smacq")
+        {
+
+        }
+        if(device == nullptr)
+            return;
         connect(device,SIGNAL(sig_connectfailed(QString)),this,SLOT(slt_recvConnectFailed(QString)),Qt::QueuedConnection);
         connect(device,SIGNAL(sig_IOCount(QString,int,int)),this,SLOT(slt_receDeviceTimes(QString,int,int)),Qt::QueuedConnection);
         connect(device,SIGNAL(sig_IObuf(QString,QByteArray,QByteArray)),this,SLOT(slt_recvDeviceInfo(QString,QByteArray,QByteArray)),Qt::QueuedConnection);
@@ -111,7 +124,8 @@ void MultipleSet::on_pb_stop_clicked()
         if(m_mapDeviceRunTime.contains(ip) && m_mapDeviceRunTime[ip].bJudge == true)
         {
             m_mapDeviceRunTime[ip].bJudge = false;
-            m_mapDeviceObject.value(ip)->Stop();
+            if(m_mapDeviceObject.contains(ip))
+                m_mapDeviceObject.value(ip)->Stop();
         }
     }
     else
@@ -163,7 +177,7 @@ void MultipleSet::slt_recvConnectFailed(QString ip)
         {
             m_mapDeviceRunTime[ip].bJudge = false;
         }
-//        on_pb_start_clicked();
+        //        on_pb_start_clicked();
     }
     else
     {
@@ -213,12 +227,15 @@ void MultipleSet::on_pb_deleteSet_clicked()
         if(m_mapDeviceRunTime.contains(ip))
         {
             m_mapDeviceRunTime.remove(ip);
-            IODevice* device = m_mapDeviceObject.take(ip);
-            device->Stop();
-            device->Close();
-            delete device;
-//            device->deleteLater();
-            device = NULL;
+            if(m_mapDeviceObject.contains(ip))
+            {
+                IODevice* device = m_mapDeviceObject.take(ip);
+                device->Stop();
+                device->Close();
+                delete device;
+                //            device->deleteLater();
+                device = NULL;
+            }
         }
         ui->table_Info->removeRow(ui->table_Info->currentRow());
     }

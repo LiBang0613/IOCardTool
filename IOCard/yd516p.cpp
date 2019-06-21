@@ -1,4 +1,7 @@
 ﻿#include "yd516p.h"
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
 
 YD516P::YD516P()
 {
@@ -40,6 +43,12 @@ bool YD516P::Query_Read(QByteArray &sendBuf, int &nLen)
 
 bool YD516P::Response_Read(QByteArray &recvBuf, int nLen)
 {
+    if(nLen != 10)
+    {
+        qDebug()<<"yd516p 数据接收错误"<<nLen<<recvBuf;
+        return false;
+    }
+
     return true;
 }
 
@@ -82,6 +91,6 @@ void YD516P::slt_readyRead()
     Response_Read(recvArray,recvArray.size());
     qDebug()<<"1240"<<QThread::currentThreadId()<<recvArray<<recvArray.size();
     emit sig_statisticsCounts(m_strIp+"|"+QString::number(m_nSmacqAddr),m_nSendTimes,m_nFailedTimes);
-    emit sig_sendRecv(m_strIp+" type:516P",m_sendArray,recvArray);
+    emit sig_sendRecv(m_strIp+"|"+QString::number(m_nSmacqAddr)+" type:516P",m_sendArray,recvArray);
     logInfo(m_strIp+"_data"," type:516P send:"+(QString)m_sendArray.toHex()+"recv:"+(QString)recvArray.toHex());
 }

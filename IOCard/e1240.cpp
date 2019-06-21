@@ -50,7 +50,6 @@ bool E1240::Response_Read(QByteArray &recvBuf, int nLen)
         logError(m_strIp+"_data","1240发送响应数据长度不一致或者功能码不一致。");
         return false;	// 错误
     }
-    //	CSafeLock cLock(&m_cMutex);
 
     ushort wVal = 0;
 

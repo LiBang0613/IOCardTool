@@ -64,7 +64,10 @@ bool E1211::Response_Read(QByteArray recvBuf, int nLen)
     uchar cLow = recvBuf[9];
     uchar cHigh = recvBuf[10];
     ushort state = 0;
-    state = (cLow << 8) | cHigh;
+//    state = (cLow << 8) | cHigh;
+    state = cLow + (cHigh << 8);
+//    qDebug()<<"state"<<state;
+//    m_wDOState = cLow + (cHigh << 8);
     return true;
 }
 
@@ -150,7 +153,7 @@ void E1211::Process()
 {
     QThread::msleep(m_nTimeInterval);
 
-    m_mutex->lock();
+//    m_mutex->lock();
     QByteArray sendArray;
     int nLen = 0;
 
@@ -169,11 +172,11 @@ void E1211::Process()
 
     if(m_qTcpSocket->waitForReadyRead() == false)
     {
-        m_mutex->unlock();
+//        m_mutex->unlock();
         return ;
     }
     slt_readyRead();
-    m_mutex->unlock();
+//    m_mutex->unlock();
 }
 
 void E1211::WriteCmdDO()

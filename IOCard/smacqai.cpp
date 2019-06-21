@@ -171,6 +171,6 @@ void SmacqAI::slt_readyRead()
     }
 
     emit sig_statisticsCounts(m_strIp+"|"+QString::number(m_nSmacqAddr),m_nSendTimes,m_nFailedTimes);
-    emit sig_sendRecv(m_strIp+" type:思迈科华AI",m_sendArray,recvBuf);
+    emit sig_sendRecv(m_strIp+"|"+QString::number(m_nSmacqAddr)+" type:思迈科华AI",m_sendArray,recvBuf);
     logInfo(m_strIp+"|"+QString::number(m_nSmacqAddr)+"_data","type:思迈科华AI send:"+(QString)m_sendArray.toHex()+" recv:"+(QString)recvBuf.toHex());
 }

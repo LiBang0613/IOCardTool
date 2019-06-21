@@ -191,7 +191,7 @@ void DaqSet::on_comB_cardType_currentIndexChanged(const QString &arg1)
 {
     if(arg1.trimmed() == "1211")
     {
-        ui->sb_pass->setRange(0,15);
+        ui->sb_pass->setRange(0,16);
     }
     else if(arg1.trimmed() == "1240")
     {
@@ -199,7 +199,7 @@ void DaqSet::on_comB_cardType_currentIndexChanged(const QString &arg1)
     }
     else if(arg1.trimmed() == "4510")
     {
-        ui->sb_pass->setRange(0,15);
+        ui->sb_pass->setRange(0,16);
     }
     else if(arg1.trimmed() == "思迈科华")
     {

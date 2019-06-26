@@ -61,7 +61,7 @@ void SmacqDO::Process()
         return ;
     }
 
-    if(m_qTcpSocket->waitForReadyRead(1000) == false)
+    if(m_qTcpSocket->waitForReadyRead(3000) == false)
     {
         m_nFailedTimes++;
         qDebug()<<"readyread error";

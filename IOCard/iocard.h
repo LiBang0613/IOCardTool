@@ -103,6 +103,7 @@ protected:
     int m_nTimeInterval;        // 命令发送时间间隔，单位：ms
     int m_nSmacqAddr;           //思迈科华设备地址。
     QMutex *m_mutex;
+    QString m_strDeviceAddr;
 
 public:
     QByteArray m_sendArray;     // 保存设备发送的命令
@@ -110,6 +111,8 @@ public:
 private:
     bool m_bNewSocket;          // socket是否已存在
     bool m_bExitThread;         // 是否退出线程函数  true - 退出, false - 不退出
+
+    QString getIpAddr();
 
 
 };

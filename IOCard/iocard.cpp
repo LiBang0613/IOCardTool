@@ -13,6 +13,8 @@ IOCard::IOCard()
     m_nTimeInterval = 1000;
     m_bNewSocket = false;
     m_nPort = 0;
+    m_nSmacqAddr = 0;
+    m_strDeviceAddr = "";
     m_pThread = new QThread;
 
     m_bExitThread = false;
@@ -102,6 +104,7 @@ void IOCard::closeThread()
 void IOCard::setDeviceAddress(int addr)
 {
     m_nSmacqAddr  = addr;
+    m_strDeviceAddr = QString::number(addr);
 }
 
 void IOCard::setMutex(QMutex *mutex)
@@ -125,7 +128,7 @@ void IOCard::slt_ProThread()
         else
         {
             stopThread();
-            emit sig_connectFailed(m_strIp);
+            emit sig_connectFailed(getIpAddr());
         }
 //        m_mutex->unlock();
     }
@@ -141,10 +144,10 @@ void IOCard::slt_newSocket()
     m_qTcpSocket->setReadBufferSize(1024);
     if(!m_qTcpSocket->waitForConnected())
     {
-        logInfo(m_strIp+"_net","ip地址连接失败");
+        logInfo(getIpAddr()+"_net","ip地址连接失败");
         qDebug()<<m_qTcpSocket->errorString();
         stopThread();
-        emit sig_connectFailed(m_strIp);
+        emit sig_connectFailed(getIpAddr());
         return;
     }
     qDebug()<<m_qTcpSocket->state();
@@ -173,9 +176,23 @@ void IOCard::slt_reConnect(QString strIP, uint nPort)
         m_qTcpSocket->connectToHost(strIP, nPort);
         if(m_qTcpSocket->waitForConnected(5000) == false)
         {
-            emit sig_connectFailed(strIP);
-            logInfo(m_strIp+"_net","socket重新连接失败");
+            emit sig_connectFailed(getIpAddr());
+            logInfo(getIpAddr()+"_net","socket重新连接失败");
             return;
         }
     }
+}
+
+QString IOCard::getIpAddr()
+{
+    QString ip = "";
+    if(!m_strDeviceAddr.isEmpty())
+    {
+        ip = m_strIp+"|"+m_strDeviceAddr;
+    }
+    else
+    {
+        ip= m_strIp;
+    }
+    return ip;
 }

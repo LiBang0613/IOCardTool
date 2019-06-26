@@ -144,8 +144,8 @@ void DaqSet::slt_clearTxetEdit()
 void DaqSet::slt_recvCardInfo(QString ip, QByteArray before, QByteArray after)
 {
     QString text ="time:"+QDateTime::currentDateTime().toString("yyyyMMdd hh:mm:ss:zzz")+" Ip:"+ip+" send:"+(QString)before.toHex()+" recv:"+(QString)after.toHex();
-//    qDebug()<<text;
-        ui->te_showMsg->append((text));
+    //    qDebug()<<text;
+    ui->te_showMsg->append((text));
 }
 
 void DaqSet::slt_receCardTimes(QString Ip, int total, int failed)
@@ -374,11 +374,24 @@ void DaqSet::slt_recvConnectFailed(QString ip)
     {
         if(m_mapIOCardObject.contains(ip))
         {
-            m_mapIOCardObject.value(ip)->reConnect(ip);
-        }
-        if(m_mapCardRunTime.contains(ip))
-        {
+            if(ip.contains("|"))
+            {
+                QStringList strList = ip.split("|");
+                QString strIp = strList.at(0);
+                m_mapIOCardObject.value(ip)->reConnect(strIp);
+            }
+            else
+            {
+                m_mapIOCardObject.value(ip)->reConnect(ip);
+            }
             m_mapCardRunTime[ip].bJudge = false;
+        }
+        else
+        {
+            if(m_mapCardRunTime.contains(ip))
+            {
+                m_mapCardRunTime[ip].bJudge = false;
+            }
         }
         //        on_pb_start_clicked();
     }

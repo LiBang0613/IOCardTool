@@ -16,7 +16,6 @@ SmacqAI::~SmacqAI()
 
 void SmacqAI::Process()
 {
-    qDebug()<<"AI===============";
     QThread::msleep(m_nTimeInterval);
     m_mutex->lock();
     QByteArray sendArray;
@@ -49,8 +48,7 @@ void SmacqAI::Process()
         m_mutex->unlock();
         return;
     }
-//qDebug()<<"33333333333333";
-    if(m_qTcpSocket->waitForReadyRead(1000) == false)
+    if(m_qTcpSocket->waitForReadyRead(3000) == false)
     {
         m_nFailedTimes++;
         logError(m_strIp+"|"+QString::number(m_nSmacqAddr)+"_data","1240发送数据错误");
@@ -58,7 +56,6 @@ void SmacqAI::Process()
         return ;
     }
 
-//qDebug()<<"44444444444";
     slt_readyRead();
     m_mutex->unlock();
 }
@@ -144,7 +141,7 @@ bool SmacqAI::Query_SetSpeedAI(QByteArray &pBuf, int &nLen)
     pBuf[i++] = 0x9c;
     pBuf[i++] = 0xb9;
     pBuf[i++] = 0x00;
-    pBuf[i++] = 0x04;
+    pBuf[i++] = 0x03;
     nLen = i;
     return true;
 }
